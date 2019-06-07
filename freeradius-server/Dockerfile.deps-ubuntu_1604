@@ -132,3 +132,8 @@ RUN for i in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin 
 		git checkout $i; \
 		if [ -e ./debian/control.in ] ; then debian/rules debian/control ; fi ; echo 'y' | mk-build-deps -irt'apt-get -yV' debian/control ; \
 	done
+
+#
+#   Usual ports
+#
+EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp

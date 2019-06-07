@@ -30,8 +30,6 @@ if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 			-e LC_ALL=C \
 			-e SSH_AUTH_SOCK=$SSH_AUTH_SOCK \
 			-w /root/Devel/FreeRadius/freeradius-server.git \
-			-p 1812:1812/udp -p 1812:1812/tcp \
-			-p 1813:1813/udp -p 1813:1813/tcp \
 			-dti $image_name /bin/bash
 else
 	docker start "$docker_image"
