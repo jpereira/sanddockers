@@ -1,0 +1,134 @@
+#
+#	Author: Jorge Pereira <jpereira@freeradius.org>
+#
+FROM ubuntu:16.04
+
+ARG gccver=4.9
+ARG clangver=5.0
+ARG osname=bionic
+ARG DEBIAN_FRONTEND=noninteractive
+ENV CC=clang
+
+#
+#  Install add-apt-repository
+#
+RUN sed 's/archive.ubuntu.com/br.archive.ubuntu.com/g' -i /etc/apt/sources.list
+RUN apt-get update && \
+    apt-get install -y software-properties-common && \
+    apt-get clean && \
+    rm -r /var/lib/apt/lists/*
+
+# Update
+RUN apt-get update
+#  Development utilities
+RUN apt-get install -fy devscripts equivs git quilt build-essential
+#  eapol_test dependencies
+RUN apt-get install -fy libnl-3-dev libnl-genl-3-dev
+#  Compilers
+#RUN apt-get install -fy g++ llvm clang lldb && \
+
+#
+# 	fix locale
+#
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales
+
+RUN sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+    dpkg-reconfigure --frontend=noninteractive locales && \
+    update-locale LANG=en_US.UTF-8
+
+ENV LANG en_US.UTF-8 
+
+#
+#	Usual commands.
+#
+RUN apt-get -fy install screen vim wget ssl-cert gdb manpages-dev strace valgrind sysdig \
+                        psmisc htop openssh-server lua5.2 liblua5.2-dev tcpdump net-tools sysvbanner \
+                        iputils-ping sudo pandoc asciidoctor
+
+#
+#	Clang
+#
+RUN wget -4 -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+RUN echo "# Created at $(date)"                                              > /etc/apt/sources.list.d/llvm8-org.list
+RUN echo "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main"     >> /etc/apt/sources.list.d/llvm8-org.list
+RUN echo "deb-src http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main" >> /etc/apt/sources.list.d/llvm8-org.list
+# Update
+RUN apt-get update
+# LLVM
+RUN apt-get -fy install libllvm-8-ocaml-dev libllvm8 llvm-8 llvm-8-dev llvm-8-doc llvm-8-examples llvm-8-runtime
+# Clang and co
+RUN apt-get -fy install clang-8 clang-tools-8 clang-8-doc libclang-common-8-dev libclang-8-dev libclang1-8 clang-format-8 python-clang-8
+# libfuzzer
+RUN apt-get -fy install libfuzzer-8-dev
+# lldb
+RUN apt-get -fy install lldb-8
+# lld (linker)
+RUN apt-get -fy install lld-8
+# libc++
+RUN apt-get -fy install libc++-8-dev libc++abi-8-dev
+# OpenMP
+RUN apt-get -fy install libomp-8-dev
+
+# Fuck hack to fix the mess.
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 1000
+RUN update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer /usr/bin/llvm-symbolizer-8 1000
+RUN ln -fs /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib64/libgcc_s.so.1
+
+#
+#	CouchBase
+#
+RUN wget -4 http://packages.couchbase.com/releases/couchbase-release/couchbase-release-1.0-6-amd64.deb -O /tmp/couchbase.deb
+RUN dpkg -i /tmp/couchbase.deb
+RUN apt-get update && apt-get -y install libcouchbase-dev libcouchbase2-bin
+
+#
+#   Jorge's dotfiles
+#
+# Persist envs
+WORKDIR /root
+RUN git clone https://github.com/jpereira/dotfiles/ dotfiles.git
+WORKDIR dotfiles.git
+RUN bash -c 'echo -e "A\ns\n" | ./deploy.sh pull'
+
+#
+#  Setup a src dir in /usr/local
+#
+RUN mkdir -p /usr/local/src/repositories
+WORKDIR /usr/local/src/repositories
+
+#
+#  Get a modern version of cmake.  We need 3.8.2 or later to build libkqueue rpms
+#
+RUN curl -f -o cmake.sh https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.sh
+RUN [ "$(cat cmake.sh | openssl sha256 | sed 's/^.* //')" = "bb26b1871f9e5c2fb73476186cc94d03b674608f704b48b94d617340b87b4d73" ]
+RUN sh cmake.sh --skip-license --prefix=/usr/local
+
+#
+#  Grab libkqueue and build
+#
+WORKDIR /usr/local/src/repositories
+RUN git clone --branch master --depth=1 https://github.com/mheily/libkqueue.git
+
+WORKDIR libkqueue
+RUN cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib ./ && \
+    make && \
+    cpack -G DEB && \
+    dpkg -i --force-all ./libkqueue*.deb
+
+
+#
+#  Shallow clone the FreeRADIUS source
+#
+WORKDIR /usr/local/src/repositories
+ARG source=https://github.com/FreeRADIUS/freeradius-server.git
+RUN git clone --depth 1 --no-single-branch ${source}
+
+#
+#  Install build dependencies for all branches from v3 onwards
+#
+WORKDIR freeradius-server
+RUN for i in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin 2>/dev/null | sed -e 's#origin/##' | egrep "^(v[3-9]*\.[0-9x]*\.x|master)$");\
+	do \
+		git checkout $i; \
+		if [ -e ./debian/control.in ] ; then debian/rules debian/control ; fi ; echo 'y' | mk-build-deps -irt'apt-get -yV' debian/control ; \
+	done
