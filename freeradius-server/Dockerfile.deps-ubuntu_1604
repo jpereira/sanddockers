@@ -18,17 +18,28 @@ RUN apt-get update && \
     apt-get clean && \
     rm -r /var/lib/apt/lists/*
 
-# Update
+#
+#   Update
+#
 RUN apt-get update
-#  Development utilities
-RUN apt-get install -fy devscripts equivs git quilt build-essential
-#  eapol_test dependencies
-RUN apt-get install -fy libnl-3-dev libnl-genl-3-dev
-#  Compilers
-#RUN apt-get install -fy g++ llvm clang lldb && \
 
 #
-# 	fix locale
+#   Development utilities
+#
+RUN apt-get install -fy devscripts equivs git quilt build-essential
+
+#
+#   eapol_test dependencies
+#
+RUN apt-get install -fy libnl-3-dev libnl-genl-3-dev
+
+#
+#   Compilers
+#
+#RUN apt-get install -fy g++ llvm clang lldb
+
+#
+# 	Fix locale
 #
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales
 
@@ -45,6 +56,12 @@ RUN apt-get -fy install screen vim wget ssl-cert gdb manpages-dev strace valgrin
                         psmisc htop openssh-server lua5.2 liblua5.2-dev tcpdump net-tools sysvbanner \
                         iputils-ping sudo pandoc asciidoctor
 
+#
+#   make asciidoc
+#
+RUN apt-get -fy install libjson-perl asciidoctor pandoc
+
+#
 #
 #	Clang
 #
@@ -69,7 +86,9 @@ RUN apt-get -fy install libc++-8-dev libc++abi-8-dev
 # OpenMP
 RUN apt-get -fy install libomp-8-dev
 
-# Fuck hack to fix the mess.
+#
+#   Fuck hack to fix the mess.
+#
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 1000
 RUN update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer /usr/bin/llvm-symbolizer-8 1000
 RUN ln -fs /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib64/libgcc_s.so.1
@@ -134,6 +153,6 @@ RUN for i in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin 
 	done
 
 #
-#   Usual ports
+#   Usual ports auth/accounting/coa
 #
 EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp
