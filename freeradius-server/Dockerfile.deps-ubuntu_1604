@@ -4,7 +4,7 @@
 FROM ubuntu:16.04
 
 ARG gccver=4.9
-ARG clangver=5.0
+ARG clangver=8
 ARG osname=bionic
 ARG DEBIAN_FRONTEND=noninteractive
 ENV CC=clang
@@ -66,25 +66,25 @@ RUN apt-get -fy install libjson-perl asciidoctor pandoc
 #	Clang
 #
 RUN wget -4 -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-RUN echo "# Created at $(date)"                                              > /etc/apt/sources.list.d/llvm8-org.list
-RUN echo "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main"     >> /etc/apt/sources.list.d/llvm8-org.list
-RUN echo "deb-src http://apt.llvm.org/xenial/ llvm-toolchain-xenial-8 main" >> /etc/apt/sources.list.d/llvm8-org.list
+RUN echo "# Created at $(date)"                                              > /etc/apt/sources.list.d/llvm${clangver}-org.list
+RUN echo "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-${clangver} main"     >> /etc/apt/sources.list.d/llvm${clangver}-org.list
+RUN echo "deb-src http://apt.llvm.org/xenial/ llvm-toolchain-xenial-${clangver} main" >> /etc/apt/sources.list.d/llvm${clangver}-org.list
 # Update
 RUN apt-get update
 # LLVM
-RUN apt-get -fy install libllvm-8-ocaml-dev libllvm8 llvm-8 llvm-8-dev llvm-8-doc llvm-8-examples llvm-8-runtime
+RUN apt-get -fy install libllvm-${clangver}-ocaml-dev libllvm${clangver} llvm-${clangver} llvm-${clangver}-dev llvm-${clangver}-doc llvm-${clangver}-examples llvm-${clangver}-runtime
 # Clang and co
-RUN apt-get -fy install clang-8 clang-tools-8 clang-8-doc libclang-common-8-dev libclang-8-dev libclang1-8 clang-format-8 python-clang-8
+RUN apt-get -fy install clang-${clangver} clang-tools-${clangver} clang-${clangver}-doc libclang-common-${clangver}-dev libclang-${clangver}-dev libclang1-${clangver} clang-format-${clangver} python-clang-${clangver}
 # libfuzzer
-RUN apt-get -fy install libfuzzer-8-dev
+RUN apt-get -fy install libfuzzer-${clangver}-dev
 # lldb
-RUN apt-get -fy install lldb-8
+RUN apt-get -fy install lldb-${clangver}
 # lld (linker)
-RUN apt-get -fy install lld-8
+RUN apt-get -fy install lld-${clangver}
 # libc++
-RUN apt-get -fy install libc++-8-dev libc++abi-8-dev
+RUN apt-get -fy install libc++-${clangver}-dev libc++abi-${clangver}-dev
 # OpenMP
-RUN apt-get -fy install libomp-8-dev
+RUN apt-get -fy install libomp-${clangver}-dev
 
 #
 #   Fuck hack to fix the mess.
