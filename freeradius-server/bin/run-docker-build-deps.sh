@@ -24,8 +24,8 @@ if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 			--privileged \
 			--cap-add SYS_PTRACE \
 			-h "docker-$docker_image" \
-			-v /home/jpereira/Devel/:/root/Devel \
-			-v /docker/freeradius/:/opt/ \
+			-v /home/$USER/Devel/:/root/Devel \
+			-v /opt/docker-rootfs/freeradius/:/opt/ \
 			-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) \
 			-e LC_ALL=C \
 			-e SSH_AUTH_SOCK=$SSH_AUTH_SOCK \
