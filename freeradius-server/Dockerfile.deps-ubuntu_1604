@@ -34,11 +34,6 @@ RUN apt-get install -fy devscripts equivs git quilt build-essential
 RUN apt-get install -fy libnl-3-dev libnl-genl-3-dev
 
 #
-#   Compilers
-#
-#RUN apt-get install -fy g++ llvm clang lldb
-
-#
 # 	Fix locale
 #
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales
@@ -54,7 +49,7 @@ ENV LANG en_US.UTF-8
 #
 RUN apt-get -fy install screen vim wget ssl-cert gdb manpages-dev strace valgrind sysdig \
                         psmisc htop openssh-server lua5.2 liblua5.2-dev tcpdump net-tools sysvbanner \
-                        iputils-ping sudo pandoc asciidoctor
+                        iputils-ping sudo
 
 #
 #   make asciidoc
@@ -63,11 +58,11 @@ RUN apt-get -fy install libjson-perl asciidoctor pandoc
 
 #
 #
-#	Clang
+#	Clang (compiler)
 #
 RUN wget -4 -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-RUN echo "# Created at $(date)"                                              > /etc/apt/sources.list.d/llvm${clangver}-org.list
-RUN echo "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-${clangver} main"     >> /etc/apt/sources.list.d/llvm${clangver}-org.list
+RUN echo "# Created at $(date)" > /etc/apt/sources.list.d/llvm${clangver}-org.list
+RUN echo "deb http://apt.llvm.org/xenial/ llvm-toolchain-xenial-${clangver} main" >> /etc/apt/sources.list.d/llvm${clangver}-org.list
 RUN echo "deb-src http://apt.llvm.org/xenial/ llvm-toolchain-xenial-${clangver} main" >> /etc/apt/sources.list.d/llvm${clangver}-org.list
 # Update
 RUN apt-get update
@@ -87,10 +82,10 @@ RUN apt-get -fy install libc++-${clangver}-dev libc++abi-${clangver}-dev
 RUN apt-get -fy install libomp-${clangver}-dev
 
 #
-#   Fuck hack to fix the mess.
+#   Hack to fix the mess.
 #
-RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-8 1000
-RUN update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer /usr/bin/llvm-symbolizer-8 1000
+RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${clangver} 1000
+RUN update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer /usr/bin/llvm-symbolizer-${clangver} 1000
 RUN ln -fs /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib64/libgcc_s.so.1
 
 #
