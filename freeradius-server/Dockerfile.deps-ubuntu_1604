@@ -1,7 +1,10 @@
 #
 #	Author: Jorge Pereira <jpereira@freeradius.org>
+#   Desc: Container used as a devbox.
 #
 FROM ubuntu:16.04
+
+LABEL maintainer "Jorge Pereira <jpereira@freeradius.org>"
 
 ARG gccver=4.9
 ARG clangver=8
@@ -129,7 +132,6 @@ RUN cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR
     cpack -G DEB && \
     dpkg -i --force-all ./libkqueue*.deb
 
-
 #
 #  Shallow clone the FreeRADIUS source
 #
@@ -151,3 +153,9 @@ RUN for i in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin 
 #   Usual ports auth/accounting/coa
 #
 EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp
+
+#
+#   Copy the things
+#
+RUN mkdir -p /opt/bin
+COPY bin/* /opt/bin/
