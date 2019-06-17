@@ -6,7 +6,7 @@ export LC_ALL=C
 
 docker() {
 	echo "docker $@"
-	/usr/bin/docker $@
+	$(which docker) $@
 }
 
 is_launched() {
