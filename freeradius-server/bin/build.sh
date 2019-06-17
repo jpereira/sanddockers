@@ -33,7 +33,7 @@ fi
 banner "FREERADIUS  $branch/v$ver"
 
 echo "Only BUILD? $([ -n $build ] && echo Yes || echo No)"
-set -fx
+#set -fx
 
 if echo $CC | grep -q clang; then
 	clang_opt="--enable-llvm-address-sanitizer"
@@ -54,13 +54,13 @@ make -j${NCPU}
 
 [ "$build" = "1" ] && exit
 
-if ! echo $HOSTNAME | grep -i docker -q; then
+if ! echo $HOSTNAME | grep -qie "(docker|devbox)"; then
 	echo "Oops! We only call 'make install' under docker. exiting."
 	exit
 fi
 
 echo "---------------------------------------------------------"
-echo "Chamando 'make install'"
+echo "Calling 'make install'"
 echo "---------------------------------------------------------"
 sudo make install 1> /dev/null
 
@@ -70,5 +70,5 @@ ${prefix}/etc/raddb/certs/bootstrap
 if [ "$ver" = "4" ]; then
 	ln -fs /opt/freeradius4/etc/raddb/mods-available/isc_dhcp /opt/freeradius4/etc/raddb/mods-enabled/
 fi
-set +fx
+#set +fx
 
