@@ -165,4 +165,6 @@ EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp
 RUN mkdir -p /opt/bin
 COPY bin/* /opt/bin/
 
+COPY etc/bin2path.sh /etc/profile.d
+
 VOLUME /sandbox
