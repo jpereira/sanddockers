@@ -10,24 +10,23 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
 fi
 
 if [ "$1" = "centos" ]; then
-	image_os="centos7"
+	image_os="freeradius-server-centos7"
 	image_name="jpereiran/sanddockers:devbox-freeradius-server-centos7"
 else
-	image_os="ubuntu16"
+	image_os="freeradius-server-ubuntu16"
 	image_name="jpereiran/sanddockers:devbox-freeradius-server"
 fi
 
-docker_image="freeradius-$image_os"
+docker_image="$image_os"
 
 mkdir -p ~/Devel
 
-set +fx
-
+#set -fx
 if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
-	docker run --name="$docker_image" \
+	docker run ${docker_opts[*]} --name="$docker_image" \
 			--privileged \
 			--cap-add SYS_PTRACE \
-			-h "docker-$docker_image" \
+			-h "devbox-$docker_image" \
 			-v ~/Devel/:/root/Devel \
 			-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) \
 			-e LC_ALL=C \
@@ -39,4 +38,4 @@ fi
 
 docker attach "$docker_image"
 
-set -fx
+#set +fx
