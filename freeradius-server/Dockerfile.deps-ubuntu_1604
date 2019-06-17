@@ -1,6 +1,6 @@
 #
 #	Author: Jorge Pereira <jpereira@freeradius.org>
-#   Desc: Container used as a devbox.
+#   Desc: Freeradius Development Box
 #
 FROM ubuntu:16.04
 
@@ -25,6 +25,11 @@ RUN apt-get update && \
 #   Update
 #
 RUN apt-get update
+
+#
+#   Dist-upgrade
+#
+RUN apt-get -fy dist-upgrade
 
 #
 #   Development utilities
@@ -159,3 +164,5 @@ EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp
 #
 RUN mkdir -p /opt/bin
 COPY bin/* /opt/bin/
+
+VOLUME /sandbox
