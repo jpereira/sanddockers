@@ -27,11 +27,6 @@ RUN apt-get update && \
 RUN apt-get update
 
 #
-#   Dist-upgrade
-#
-RUN apt-get -fy dist-upgrade
-
-#
 #   Development utilities
 #
 RUN apt-get install -fy devscripts equivs git quilt build-essential
@@ -153,6 +148,16 @@ RUN for i in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin 
 		git checkout $i; \
 		if [ -e ./debian/control.in ] ; then debian/rules debian/control ; fi ; echo 'y' | mk-build-deps -irt'apt-get -yV' debian/control ; \
 	done
+
+#
+#   Update
+#
+RUN apt-get update
+
+#
+#   Dist-upgrade
+#
+RUN apt-get -fy dist-upgrade
 
 #
 #   Usual ports auth/accounting/coa
