@@ -17,7 +17,11 @@ else
 	image_name="jpereiran/sanddockers:devbox-freeradius-server"
 fi
 
-docker_image="$image_os"
+image_name="freeradius/build-ubuntu18:latest"
+
+docker_image="devbox-$image_os"
+
+extra_opts="-v /opt/docker-rootfs/freeradius/:/opt"
 
 mkdir -p ~/Devel
 
@@ -26,8 +30,9 @@ if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 	docker run ${docker_opts[*]} --name="$docker_image" \
 			--privileged \
 			--cap-add SYS_PTRACE \
-			-h "devbox-$docker_image" \
+			-h "$docker_image" \
 			-v ~/Devel/:/root/Devel \
+			${extra_opts[*]} \
 			-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) \
 			-e LC_ALL=C \
 			-e SSH_AUTH_SOCK=$SSH_AUTH_SOCK \

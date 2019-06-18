@@ -1,8 +1,8 @@
-all: ubuntu1604
+all: ubuntu1804
 
-ubuntu1604: 
-	docker build "$(PWD)" -f "Dockerfile.deps-ubuntu_1604" -t jpereiran/sanddockers:devbox-freeradius-server
+ubuntu1804: 
+	docker build "$(PWD)" -f "Dockerfile.deps-ubuntu_1804" -t jpereiran/devbox-freeradius-server:latest
 
 
 push:
-	docker push jpereiran/sanddockers:devbox-freeradius-server
+	docker push jpereiran/devbox-freeradius-server:latest

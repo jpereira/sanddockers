@@ -2,7 +2,7 @@
 #	Author: Jorge Pereira <jpereira@freeradius.org>
 #   Desc: Freeradius Development Box
 #
-FROM ubuntu:16.04
+FROM ubuntu:18.04
 
 LABEL maintainer "Jorge Pereira <jpereira@freeradius.org>"
 
@@ -99,15 +99,6 @@ RUN dpkg -i /tmp/couchbase.deb
 RUN apt-get update && apt-get -y install libcouchbase-dev libcouchbase2-bin
 
 #
-#   Jorge's dotfiles
-#
-# Persist envs
-WORKDIR /root
-RUN git clone https://github.com/jpereira/dotfiles/ dotfiles.git
-WORKDIR dotfiles.git
-RUN bash -c 'echo -e "A\ns\n" | ./deploy.sh pull'
-
-#
 #  Setup a src dir in /usr/local
 #
 RUN mkdir -p /opt/src
@@ -160,6 +151,15 @@ RUN apt-get update
 RUN apt-get -fy dist-upgrade
 
 #
+#   Jorge's dotfiles
+#
+# Persist envs
+WORKDIR /root
+RUN git clone https://github.com/jpereira/dotfiles/ dotfiles.git
+WORKDIR dotfiles.git
+RUN bash -c 'echo -e "A\ns\n" | ./deploy.sh pull'
+
+#
 #   Usual ports auth/accounting/coa
 #
 EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp
@@ -167,9 +167,15 @@ EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp
 #
 #   Copy the things
 #
-RUN mkdir -p /opt/bin
-COPY bin/* /opt/bin/
+RUN mkdir -p /opt/local/bin
+COPY bin/* /usr/local/bin/
 
+#
+#   Profile scripts
+#
 COPY etc/bin2path.sh /etc/profile.d
 
-VOLUME /sandbox
+#
+#  Another volume
+#
+VOLUME ["/sandbox"]
