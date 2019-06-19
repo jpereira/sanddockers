@@ -11,20 +11,22 @@ fi
 
 if [ "$1" = "centos" ]; then
 	image_os="freeradius-server-centos7"
-	image_name="jpereiran/sanddockers:devbox-freeradius-server-centos7"
+	image_name="jpereiran/devbox-freeradius-server:centos7"
 else
-	image_os="freeradius-server-ubuntu16"
-	image_name="jpereiran/sanddockers:devbox-freeradius-server"
+	image_os="freeradius-server-ubuntu1804"
+	image_name="jpereiran/devbox-freeradius-server:ubuntu1804"
 fi
-
-image_name="freeradius/build-ubuntu18:latest"
+shift
 
 docker_image="devbox-$image_os"
-
 extra_opts="-v /opt/docker-rootfs/freeradius/:/opt"
 
-mkdir -p ~/Devel
+if [ "$1" = "reset" ]; then
+	echo "# Removing $docker_image (relaunch)"
+	docker rm -f $docker_image
+fi
 
+mkdir -p ~/Devel
 #set -fx
 if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 	docker run ${docker_opts[*]} --name="$docker_image" \

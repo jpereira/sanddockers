@@ -40,6 +40,8 @@ if echo $CC | grep -q clang; then
 	clang --version
 fi
 
+echo "# Calling ./configure ....."
+
 # disable stdout
 exec 1> /dev/null
 

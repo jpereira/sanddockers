@@ -10,7 +10,7 @@ export DO_BUILD=yes
 export LIBS_OPTIONAL=yes
 export LIBS_SHARED=yes
 export BUILD_CFLAGS="-g3 -Wdocumentation-html"
-export CFLAGS="-DWITH_EVAL_DEBUG -g3 -I/usr/include"
+#export CFLAGS="-DWITH_EVAL_DEBUG -g3 -I/usr/include"
 export FR_GLOBAL_POOL=2M
 export NCPU=$(($(grep "cpu family" /proc/cpuinfo  | wc -l)*2))
 
