@@ -26,7 +26,8 @@ if [ "$1" = "reset" ]; then
 	docker rm -f $docker_image
 fi
 
-mkdir -p ~/Devel
+mkdir -p ~/Devel /opt/docker-rootfs/freeradius/
+
 #set -fx
 if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 	docker run ${docker_opts[*]} --name="$docker_image" \
