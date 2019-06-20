@@ -39,6 +39,7 @@ if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 			-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) \
 			-e LC_ALL=C \
 			-e SSH_AUTH_SOCK=$SSH_AUTH_SOCK \
+			-e SHELL=$SHELL -e COLUMNS=$COLUMNS -e LINES=$LINES -e TERM=$TERM \
 			-dti $image_name /bin/bash
 else
 	docker start "$docker_image"
