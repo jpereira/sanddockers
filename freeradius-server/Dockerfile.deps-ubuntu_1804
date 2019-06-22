@@ -56,7 +56,7 @@ ENV LANG en_US.UTF-8
 #	Usual commands.
 #
 RUN apt-get -fy install screen vim wget ssl-cert gdb manpages-dev strace valgrind sysdig \
-                        psmisc htop openssh-server lua5.2 liblua5.2-dev tcpdump net-tools sysvbanner \
+                        psmisc htop openssh-server tcpdump net-tools sysvbanner \
                         iputils-ping sudo
 
 #
@@ -108,6 +108,16 @@ RUN dpkg -i /tmp/couchbase.deb
 RUN apt-get update;true
 RUN apt-get -fy install libcouchbase-dev
 
+#
+#	Luajit
+#
+RUN mkdir -p /tmp/luajit
+WORKDIR /tmp/luajit
+RUN for i in http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-2_2.0.4%2Bdfsg-1_amd64.deb \
+	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-common_2.0.4%2Bdfsg-1_all.deb \
+	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-dev_2.0.4%2Bdfsg-1_amd64.deb \
+	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/luajit_2.0.4%2Bdfsg-1_amd64.deb; do wget -4 $i; done
+RUN dpkg -i /tmp/luajit/*.deb
 #
 #  Setup a src dir in /usr/local
 #
