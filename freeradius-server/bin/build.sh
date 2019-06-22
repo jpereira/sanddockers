@@ -46,8 +46,9 @@ echo "# Calling ./configure ....."
 exec 1> /dev/null
 
 # do it
-nice -20 ./configure -C --enable-developer --prefix="$prefix" $clang_opt \
-	     --with-systemd=yes --with-rlm-lua $@
+nice -20 ./configure -C --enable-werror --enable-developer \
+			--prefix="$prefix" $clang_opt \
+			--with-systemd=yes --with-rlm-lua $@
 
 echo "---------------------------------------------------------"
 echo "Calling 'make -j $NCPU'"

@@ -1,5 +1,5 @@
 #export TEST_CERTS=yes
-#export PANIC_ACTION="gdb -batch -x raddb/panic.gdb %e %p 1>&0 2>&0"
+export PANIC_ACTION="gdb -batch -x raddb/panic.gdb %e %p 1>&0 2>&0"
 export ASAN_OPTIONS="symbolize=1 detect_leaks=1 detect_stack_use_after_return=1"
 export LSAN_OPTIONS="symbolize=1 fast_unwind_on_malloc=0:malloc_context_size=50"
 #export KQUEUE_DEBUG="yes"
@@ -12,5 +12,8 @@ export LIBS_SHARED=yes
 export BUILD_CFLAGS="-g3 -Wdocumentation-html"
 #export CFLAGS="-DWITH_EVAL_DEBUG -g3 -I/usr/include"
 export FR_GLOBAL_POOL=2M
-export NCPU=$(($(grep "cpu family" /proc/cpuinfo  | wc -l)*2))
+export NCPU=$(grep "cpu family" /proc/cpuinfo  | wc -l)
 
+export CC=clang
+export CC_FOR_BUILD=$CC
+export TRAVIS_COMPILER=$CC
