@@ -178,7 +178,7 @@ RUN apt-get -fy dist-upgrade
 WORKDIR /root
 RUN git clone https://github.com/jpereira/dotfiles/ dotfiles.git
 WORKDIR dotfiles.git
-RUN bash -c 'echo -e "A\ns\n" | ./deploy.sh pull'
+RUN ./install.sh run
 
 #
 #   Usual ports auth/accounting/coa
