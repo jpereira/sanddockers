@@ -63,7 +63,7 @@ make -j${NCPU} scan
 echo "---------------------------------------------------------"
 echo "Calling 'cd doc/source && doxygen 1> /dev/null'"
 echo "---------------------------------------------------------"
-(cd doc/source && doxygen 1> /dev/null)
+(cd doc/source; doxygen 3>&1 1>&2 2>&3 | grep -iv '^warning:')
 
 [ "$build" = "1" ] && exit
 
