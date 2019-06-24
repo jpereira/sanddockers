@@ -4,7 +4,7 @@
 
 export LC_ALL=C
 
-docker_rootfs="/opt/docker-rootfs/freeradius/"
+docker_rootfs="$HOME/Docker/storage/freeradius/"
 
 if [ -z "$SSH_AUTH_SOCK" ]; then
 	echo "ERRO: SSH_AUTH_SOCK ??? call ssh-agent"
@@ -27,7 +27,7 @@ if [ "$1" = "reset" ]; then
 	docker rm -f $docker_image
 fi
 
-mkdir -p ~/Devel $docker_rootfs
+mkdir -p $docker_rootfs
 
 if [ -d "$docker_rootfs" ]; then
 	extra_opts="-v $docker_rootfs:/opt"
@@ -39,8 +39,8 @@ if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 			--privileged \
 			--cap-add SYS_PTRACE \
 			-h "$docker_image" \
-			-v ~/Devel/:/root/Devel \
-			-w ~/Devel/FreeRadius/freeradius-server.git \
+			-v $HOME/Devel/:/root/Devel \
+			-w $HOME/Devel/FreeRadius/freeradius-server.git \
 			${extra_opts[*]} \
 			-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) \
 			-e LC_ALL=C \
