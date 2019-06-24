@@ -55,6 +55,11 @@ echo "Calling 'make -j $NCPU'"
 echo "---------------------------------------------------------"
 make -j${NCPU}
 
+echo "---------------------------------------------------------"
+echo "Calling 'make -j $NCPU scan'"
+echo "---------------------------------------------------------"
+make -j${NCPU} scan
+
 [ "$build" = "1" ] && exit
 
 if ! echo $HOSTNAME | grep -qie "(docker|devbox)"; then
