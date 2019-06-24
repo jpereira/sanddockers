@@ -62,7 +62,7 @@ RUN apt-get -fy install screen vim wget ssl-cert gdb manpages-dev strace valgrin
 #
 #   make asciidoc
 #
-RUN apt-get -fy install libjson-perl asciidoctor pandoc
+RUN apt-get -fy install libjson-perl asciidoctor pandoc doxygen
 
 #
 #

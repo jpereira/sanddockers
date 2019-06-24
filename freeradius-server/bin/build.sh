@@ -60,6 +60,11 @@ echo "Calling 'make -j $NCPU scan'"
 echo "---------------------------------------------------------"
 make -j${NCPU} scan
 
+echo "---------------------------------------------------------"
+echo "Calling 'cd doc/source && doxygen 1> /dev/null'"
+echo "---------------------------------------------------------"
+(cd doc/source && doxygen 1> /dev/null)
+
 [ "$build" = "1" ] && exit
 
 if ! echo $HOSTNAME | grep -qie "(docker|devbox)"; then
