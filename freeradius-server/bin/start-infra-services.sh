@@ -22,10 +22,10 @@ else
 fi
 
 # memcached
-if is_launched "^memcache$"; then
-	docker start memcache
+if is_launched "^memcached$"; then
+	docker start memcached
 else
- 	docker run --name memcache -d memcached memcached -m 64
+ 	docker run --name memcached -d memcached memcached -m 64
 fi
 
 # redis
