@@ -40,7 +40,7 @@ if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 			--cap-add SYS_PTRACE \
 			-h "$docker_image" \
 			-v $HOME/Devel/:/root/Devel \
-			-w $HOME/Devel/FreeRADIUS/freeradius-server.git \
+			-w /root/Devel/FreeRADIUS/freeradius-server.git \
 			${extra_opts[*]} \
 			-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) \
 			-e LC_ALL=C \
