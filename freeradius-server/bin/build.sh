@@ -44,18 +44,25 @@ if echo $CC | grep -q clang; then
 	clang --version
 fi
 
+# Is it Mac?
+if [ "$(uname -s)" = "Darwin" ]; then
+	export NCPU="$(sysctl -n hw.logicalcpu)"
+	extras_opts="$extras_opts --with-openssl-include-dir=/usr/local/Cellar/openssl/1.0.2s/include"
+	extras_opts="$extras_opts --with-openssl-lib-dir=/usr/local/Cellar/openssl/1.0.2s/lib"
+fi
+
+extras_opts="-C --enable-werror --prefix="$prefix" --with-systemd=yes --with-rlm-lua $clang_opt ${extras_opts} $@"
+
 decho
 decho "---------------------------------------------------------"
-decho "# Calling ./configure # (only stderr)"
+decho "# Calling ./configure ${extras_opts} # (only stderr)"
 decho "---------------------------------------------------------"
 
 # disable stdout
 exec 1> /dev/null
 
 # do it
-nice -20 ./configure -C --enable-werror --enable-developer \
-			--prefix="$prefix" $clang_opt \
-			--with-systemd=yes --with-rlm-lua $@
+nice -20 ./configure ${extras_opts}
 
 decho
 decho "---------------------------------------------------------"
