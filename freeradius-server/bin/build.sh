@@ -40,9 +40,10 @@ decho "Only BUILD? $([ -n $build ] && echo Yes || echo No)"
 #set -fx
 
 if echo $CC | grep -q clang; then
-	clang_opt="--enable-llvm-address-sanitizer"
-	clang --version
+	cc_opt="--enable-llvm-address-sanitizer"
 fi
+
+$CC --version
 
 # Is it Mac?
 if [ "$(uname -s)" = "Darwin" ]; then
@@ -51,7 +52,7 @@ if [ "$(uname -s)" = "Darwin" ]; then
 	extras_opts="$extras_opts --with-openssl-lib-dir=/usr/local/Cellar/openssl/1.0.2s/lib"
 fi
 
-extras_opts="-C --enable-werror --prefix="$prefix" --with-systemd=yes --with-rlm-lua $clang_opt ${extras_opts} $@"
+extras_opts="-C --enable-werror --prefix="$prefix" --with-systemd=yes --with-rlm-lua $cc_opt ${extras_opts} $@"
 
 decho
 decho "---------------------------------------------------------"

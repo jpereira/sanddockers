@@ -14,6 +14,7 @@ export BUILD_CFLAGS="-g3 -Wdocumentation-html"
 export FR_GLOBAL_POOL=2M
 export NCPU=$(grep "cpu family" /proc/cpuinfo  | wc -l)
 
-export CC=clang
+export CC=${CC:-clang}
 export CC_FOR_BUILD=$CC
 export TRAVIS_COMPILER=$CC
+
