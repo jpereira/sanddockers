@@ -43,7 +43,10 @@ if echo $CC | grep -q clang; then
 	cc_opt="--enable-llvm-address-sanitizer"
 fi
 
+echo "------------------------------------"
+echo "# Compiler"
 $CC --version
+echo "------------------------------------"
 
 # Is it Mac?
 if [ "$(uname -s)" = "Darwin" ]; then
