@@ -1,8 +1,8 @@
-all: ubuntu1804
+DIST := ubuntu_1910
 
-ubuntu1804: 
-	docker build "$(PWD)" -f "Dockerfile.deps-ubuntu_1804" -t jpereiran/devbox-freeradius-server:latest
+all: 
+	docker build "$(PWD)" -f "Dockerfile.deps-$(DIST)" -t jpereiran/devbox-freeradius-server:latest
 
 
 push:
-	docker push jpereiran/devbox-freeradius-server:ubuntu1804
+	docker push jpereiran/devbox-freeradius-server:$(DIST)

@@ -15,7 +15,7 @@ if [ "$1" = "centos" ]; then
 	image_os="freeradius-server-centos7"
 	image_name="jpereiran/devbox-freeradius-server:centos7"
 else
-	image_os="freeradius-server-ubuntu1804"
+	image_os="freeradius-server-ubuntu1910"
 	image_name="jpereiran/devbox-freeradius-server:latest"
 fi
 shift
