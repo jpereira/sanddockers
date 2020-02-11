@@ -6,3 +6,7 @@ all:
 
 push:
 	docker push jpereiran/devbox-freeradius-server:$(DIST)
+
+pull:
+	docker pull jpereiran/devbox-freeradius-server:$(DIST)
+
