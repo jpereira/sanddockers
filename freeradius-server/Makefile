@@ -1,4 +1,4 @@
-DIST := ubuntu_1910
+DIST := ubuntu_2004
 
 all: 
 	docker build "$(PWD)" -f "Dockerfile.deps-$(DIST)" -t jpereiran/devbox-freeradius-server:latest
