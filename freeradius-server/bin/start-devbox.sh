@@ -38,7 +38,8 @@ fi
 if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 	docker run ${docker_opts[*]} --name="$docker_image" \
 			--privileged \
-			--cap-add ALL \
+			--cap-add=ALL \
+			-p 1812:1812/udp -p 1813:1813/udp -p 3799:3799/udp \
 			-h "$docker_image" \
 			-v $HOME/Devel/:/root/Devel \
 			-w /root/Devel/FreeRADIUS/freeradius-server.git \
