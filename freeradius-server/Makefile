@@ -1,12 +1,14 @@
+DOCKER := docker
+DOCKET_OPTS :=
+
 DIST := ubuntu_2004
 
 all: 
-	docker build "$(PWD)" -f "Dockerfile.deps-$(DIST)" -t jpereiran/devbox-freeradius-server:latest
-
+	$(DOCKER) build $(DOCKER_OPTS) "$(PWD)" -f "Dockerfile.deps-$(DIST)" -t jpereiran/devbox-freeradius-server:latest
 
 push:
-	docker push jpereiran/devbox-freeradius-server:$(DIST)
+	$(DOCKER) push $(DOCKER_OPTS) jpereiran/devbox-freeradius-server:$(DIST)
 
 pull:
-	docker pull jpereiran/devbox-freeradius-server:$(DIST)
+	$(DOCKER) pull $(DOCKER_OPTS) jpereiran/devbox-freeradius-server:$(DIST)
 
