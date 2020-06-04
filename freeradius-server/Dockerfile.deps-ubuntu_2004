@@ -216,3 +216,9 @@ VOLUME ["/sandbox"]
 #   Default HOME
 #
 WORKDIR /root/Devel
+
+#
+#   Please, we have to listen!
+#
+EXPOSE 1812/udp 1813/udp 3799/udp
+

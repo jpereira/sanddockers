@@ -38,7 +38,7 @@ fi
 if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 	docker run ${docker_opts[*]} --name="$docker_image" \
 			--privileged \
-			--cap-add SYS_PTRACE \
+			--cap-add ALL \
 			-h "$docker_image" \
 			-v $HOME/Devel/:/root/Devel \
 			-w /root/Devel/FreeRADIUS/freeradius-server.git \
