@@ -34,7 +34,7 @@ if [ -d "$docker_rootfs" ]; then
 	extra_opts="-v $docker_rootfs:/opt"
 fi
 
-if [ -n "$x11" ]; then
+if [ -z "$nox11" ]; then
 	x11_args="-e DISPLAY=192.168.1.11:0"
 
 	echo "Starting - socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\""
