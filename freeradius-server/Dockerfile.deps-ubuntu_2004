@@ -58,7 +58,7 @@ ENV LANG en_US.UTF-8
 #
 RUN aptitude install -fy screen vim wget ssl-cert gdb manpages-dev strace valgrind sysdig \
                         psmisc htop openssh-server tcpdump net-tools sysvbanner \
-                        iputils-ping sudo
+                        iputils-ping sudo heaptrack
 
 #
 #  Documentation build dependecies
