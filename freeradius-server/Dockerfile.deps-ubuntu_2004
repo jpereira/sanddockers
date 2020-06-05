@@ -114,6 +114,7 @@ RUN aptitude install -fy libomp-${clangver}-dev
 #
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${clangver} 1000
 RUN update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer /usr/bin/llvm-symbolizer-${clangver} 1000
+RUN update-alternatives --install /bin/lldb lldb /bin/lldb-${clangver} 1000
 RUN ln -fs /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib64/libgcc_s.so.1
 
 #
