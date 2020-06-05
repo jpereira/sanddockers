@@ -117,6 +117,12 @@ RUN update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer /usr/
 RUN ln -fs /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib64/libgcc_s.so.1
 
 #
+#   Voltron debug env
+#
+RUN apt -fy install python3-pip
+RUN pip3 install voltron
+
+#
 #	CouchBase
 #
 RUN wget -4 -O - http://packages.couchbase.com/ubuntu/couchbase.key | apt-key add -
