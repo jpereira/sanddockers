@@ -35,7 +35,7 @@ RUN apt-get update
 #
 #   Development utilities
 #
-RUN aptitude install -fy devscripts equivs git quilt build-essential
+RUN aptitude install -fy devscripts equivs git git-lfs quilt build-essential
 
 #
 #   eapol_test dependencies
