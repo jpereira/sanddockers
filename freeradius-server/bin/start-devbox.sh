@@ -5,6 +5,7 @@
 export LC_ALL=C
 
 docker_rootfs="$HOME/Docker/storage/freeradius/"
+cwd="/root/Devel/FreeRADIUS/freeradius-server.git"
 
 if [ -z "$SSH_AUTH_SOCK" ]; then
 	echo "ERRO: SSH_AUTH_SOCK ??? call ssh-agent"
@@ -44,6 +45,8 @@ if [ -z "$nox11" ]; then
 	echo "Appending x11_args='$x11_args'"
 fi
 
+[ "$(uname -s)" != "Linux" ] && cwd="${cwd}-linux"
+
 #set -fx
 if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 	docker run ${docker_opts[*]} --name="$docker_image" \
@@ -53,7 +56,7 @@ if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 			-p 1812:1812/udp -p 1813:1813/udp -p 3799:3799/udp \
 			-h "$docker_image" \
 			-v $HOME/Devel/:/root/Devel \
-			-w /root/Devel/FreeRADIUS/freeradius-server.git-linux \
+			-w "$cwd" \
 			${extra_opts[*]} \
 			-v $(dirname $SSH_AUTH_SOCK):$(dirname $SSH_AUTH_SOCK) \
 			-e LC_ALL=C \
