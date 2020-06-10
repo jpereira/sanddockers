@@ -45,7 +45,7 @@ RUN aptitude install -fy devscripts equivs git git-lfs quilt build-essential mor
 			libcollectdclient-dev \
 			libosmo-sccp-dev \
 			libunbound-dev \
-			libosmo-abis-dev
+			libosmo-abis-dev \
 			libosmo-fl2k-dev libosmo-legacy-mgcp-dev libosmo-mgcp-client-dev libosmo-netif-dev \
 			libosmo-ranap-dev libosmo-sccp-dev libosmo-sigtran-dev libosmocore-dev libosmosdr-dev \
 			libidn11-dev libidn11-dev
