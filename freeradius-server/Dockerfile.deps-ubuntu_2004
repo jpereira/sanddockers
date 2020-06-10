@@ -33,6 +33,11 @@ RUN apt-get update && \
 RUN apt-get update
 
 #
+#   Snmp Utilities
+#
+RUN aptitude install -fy snmp snmpd
+
+#
 #   Development utilities
 #
 RUN aptitude install -fy devscripts equivs git git-lfs quilt build-essential moreutils
