@@ -40,7 +40,10 @@ RUN aptitude install -fy snmp snmpd
 #
 #   Development utilities
 #
-RUN aptitude install -fy devscripts equivs git git-lfs quilt build-essential moreutils
+RUN aptitude install -fy devscripts equivs git git-lfs quilt build-essential moreutils \
+			google-perftools libgoogle-perftools-dev \
+			libcollectdclient-dev \
+			libosmo-sccp-dev
 
 #
 #   eapol_test dependencies
