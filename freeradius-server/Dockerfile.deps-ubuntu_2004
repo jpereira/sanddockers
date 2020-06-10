@@ -43,7 +43,8 @@ RUN aptitude install -fy snmp snmpd
 RUN aptitude install -fy devscripts equivs git git-lfs quilt build-essential moreutils \
 			google-perftools libgoogle-perftools-dev \
 			libcollectdclient-dev \
-			libosmo-sccp-dev
+			libosmo-sccp-dev \
+			dialog
 
 #
 #   eapol_test dependencies
