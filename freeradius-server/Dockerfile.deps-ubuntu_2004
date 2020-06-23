@@ -56,6 +56,11 @@ RUN aptitude install -fy devscripts equivs git git-lfs quilt build-essential mor
 RUN aptitude install -fy libnl-3-dev libnl-genl-3-dev
 
 #
+#   Install the radsecproxy
+#
+RUN aptitude install -fy radsecproxy
+
+#
 # 	Fix locale
 #
 RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales apt-utils
