@@ -38,6 +38,11 @@ RUN apt-get update
 RUN aptitude install -fy snmp snmpd dialog
 
 #
+#   Radsec dependencies
+#
+RUN aptitude install -fy nettle-dev
+
+#
 #   Development utilities
 #
 RUN aptitude install -fy devscripts equivs git git-lfs quilt build-essential moreutils \
