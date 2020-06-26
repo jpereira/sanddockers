@@ -36,7 +36,13 @@ if [ -d "$docker_rootfs" ]; then
 fi
 
 if [ -z "$nox11" ]; then
-	x11_args="-e DISPLAY=192.168.1.11:0"
+	if [ "$(uname -s)" = "Linux" ]; then
+		ipaddr4="$(ifconfig docker0 | awk '/inet /{print $2}')"
+	else
+		ipaddr4="192.168.1.11"
+	fi
+
+	x11_args="-e DISPLAY=${ipaddr4}:0"
 
 	echo "Starting - socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\""
 	killall -9 socat 1> /dev/null 2>&1
