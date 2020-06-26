@@ -195,8 +195,8 @@ RUN cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR
 #
 WORKDIR /opt/src
 ARG source=https://github.com/FreeRADIUS/freeradius-server.git
-#RUN git clone --depth 1 --no-single-branch ${source}
-RUN git clone ${source}
+RUN git clone --depth 1 --no-single-branch ${source}
+#RUN git clone ${source}
 
 #
 #  Install build dependencies for all branches from v3 onwards
@@ -228,11 +228,6 @@ WORKDIR dotfiles.git
 RUN ./install.sh run
 
 #
-#   Usual ports auth/accounting/coa
-#
-EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp
-
-#
 #   Copy the things
 #
 RUN mkdir -p /opt/local/bin
@@ -254,7 +249,6 @@ VOLUME ["/sandbox"]
 WORKDIR /root/Devel
 
 #
-#   Please, we have to listen!
+#   Usual ports auth/accounting/coa
 #
-EXPOSE 1812/udp 1813/udp 3799/udp
-
+EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp
