@@ -18,7 +18,7 @@ if [ "$1" = "centos" ]; then
 #	image_name="jpereiran/devbox-freeradius-server:centos7"
 	image_name="freeradius-centos7"
 else
-	image_os="freeradius-server-ubuntu2004"
+	image_os="freeradius-server-ubuntu_2004"
 	image_name="jpereiran/devbox-freeradius-server:latest"
 fi
 shift
@@ -26,7 +26,7 @@ shift
 docker_image="devbox-$image_os"
 
 if [ "$1" = "reset" ]; then
-	echo "# Removing $docker_image (relaunch)"
+	echo "$arg0: [**] Removing $docker_image (relaunch)"
 	docker rm -f $docker_image
 fi
 
@@ -72,7 +72,7 @@ if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
 			--privileged                                           \
 			${x11_args[*]}                                         \
 			${extra_opts[*]}                                       \
-			--cap-add=ALL                                          \
+			--cap-add=NET_ADMIN                                          \
 			-h "$docker_image"                                     \
 			-v $HOME/Devel/:/root/Devel                            \
 			-w "$cwd"                                              \

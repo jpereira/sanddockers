@@ -35,7 +35,7 @@ RUN apt-get update
 #
 #   Utilities
 #
-RUN aptitude install -fy snmp snmpd dialog telnet netcat
+RUN aptitude install -fy snmp snmpd dialog telnet netcat iproute2
 
 #
 #   Radsec dependencies
