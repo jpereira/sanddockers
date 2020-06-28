@@ -19,7 +19,8 @@ if [ "$1" = "centos" ]; then
 	image_name="freeradius-centos7"
 else
 	image_os="freeradius-server-ubuntu_2004"
-	image_name="jpereiran/devbox-freeradius-server:latest"
+#	image_name="jpereiran/devbox-freeradius-server:latest"
+	image_name="jpereiran/devbox-freeradius-server:ubuntu_2004"
 fi
 shift
 
@@ -65,6 +66,8 @@ if [ -z "$nox11" ]; then
 
 	echo "${arg0}: [**] Appending x11_args='$x11_args'"
 fi
+
+extra_opts="--net=host ${extra_opts}"
 
 #set -fx
 if ! docker ps -a --format  '{{.Names}}' | grep "^$docker_image$"; then
