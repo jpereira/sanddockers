@@ -32,7 +32,7 @@ Vagrant.configure("2") do |config|
     portsnap extract
 
     pkg update
-    yes | pkg install vim htop sshfs fusefs-sshfs bash coreutils gdb clang portmaster
+    yes | pkg install git vim htop sshfs fusefs-sshfs bash coreutils gdb clang portmaster
 
     make -C /usr/ports/net/freeradius3/
 
