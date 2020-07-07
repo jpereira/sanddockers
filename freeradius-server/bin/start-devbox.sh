@@ -32,7 +32,7 @@ decho() {
 #
 #	Check opts
 #
-while getopts 'adrpnPhs' OPTION; do
+while getopts 'adrpnPhsx:' OPTION; do
 	case $OPTION in
 		a)
 			decho "Enabling --cap-add=NET_ADMIN"
@@ -65,13 +65,18 @@ while getopts 'adrpnPhs' OPTION; do
 			extra_opts+="--privileged "
 		;;
 
+		x)
+			ipaddr4="$OPTARG"
+			decho "Setting x11 with $ipaddr4"
+		;;
+
 		s)
 			decho "Starting 'screen -R'"
 			image_exec=($image_exec -c 'sleep 1; exec 1> /dev/tty 2> /dev/tty < /dev/tty && screen -R; exit 0')
 		;;
 
 		?|h)
-			echo "Usage: $0 [-arpnPsh]"
+			echo "Usage: $0 [-arpnPsh] [-x x11_ipaddr4]"
 			echo
 			echo "-a 	Start with NET_ADMIN"
 			echo "-r 	Relaunch a new instance"
@@ -79,6 +84,7 @@ while getopts 'adrpnPhs' OPTION; do
 			echo "-n 	Enable --net=host"
 			echo "-P 	Enable privileged: --privileged"
 			echo "-s 	Start with \"screen -RA\""
+			echo "-x    x11 ipv4 addr"
 			echo "-h 	Show help"
 
 			exit
@@ -93,19 +99,19 @@ if [ -z "$nox11" ]; then
 
 	case ${uname_s} in
 		Linux)
-			ipaddr4="$(ifconfig docker0 | awk '/inet /{ print $2}')"
+			[ -z "$ipaddr4" ] && ipaddr4="$(ifconfig docker0 | awk '/inet /{ print $2}')"
 			cwd="${cwd}"
 			x11_args="-v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=${DISPLAY}"
 		;;
 
 		Darwin)
-			ipaddr4="$(ifconfig en0 | awk '/inet /{ print $2}')"
+			[ -z "$ipaddr4" ] && ipaddr4="$(ifconfig en0 | awk '/inet /{ print $2}')"
 			cwd="${cwd}-linux"
 			x11_args="-e DISPLAY=${ipaddr4}:0"
 
-			decho "Starting - socat TCP-LISTEN:6000,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\""
+			decho "Starting - socat TCP-LISTEN:6000,bind=${ipaddr4},reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\""
 			killall -9 socat 1> /dev/null 2>&1
-			socat TCP-LISTEN:6000,reuseaddr,fork "UNIX-CLIENT:\"$DISPLAY\"" &
+			socat TCP-LISTEN:6000,bind=${ipaddr4},reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" &
 		;;
 	esac
 
