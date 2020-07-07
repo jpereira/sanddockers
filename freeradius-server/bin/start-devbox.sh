@@ -99,15 +99,28 @@ if [ -z "$nox11" ]; then
 
 	case ${uname_s} in
 		Linux)
+			x11_unix="/tmp/.X11-unix"
 			[ -z "$ipaddr4" ] && ipaddr4="$(ifconfig docker0 | awk '/inet /{ print $2}')"
 			cwd="${cwd}"
-			x11_args="-v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=${DISPLAY}"
+
+			if [ ! -e "$x11_unix" ]; then
+				decho "ERROR: Can't set up the x11 due to ${x11_unix} not exist"
+				exit 1
+			fi
+
+			x11_args="-v ${x11_unix}:${x11_unix} -e DISPLAY=${DISPLAY}"
 		;;
 
 		Darwin)
 			[ -z "$ipaddr4" ] && ipaddr4="$(ifconfig en0 | awk '/inet /{ print $2}')"
 			cwd="${cwd}-linux"
 			x11_args="-e DISPLAY=${ipaddr4}:0"
+			x11_unix="${DISPLAY}"
+
+			if [ ! -e "${x11_unix}" ]; then
+				decho "ERROR: Can't set up the x11 due to ${x11_unix} not exist"
+				exit 1
+			fi
 
 			decho "Starting - socat TCP-LISTEN:6000,bind=${ipaddr4},reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\""
 			killall -9 socat 1> /dev/null 2>&1
