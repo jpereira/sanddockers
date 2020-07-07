@@ -20,6 +20,8 @@ image_name="jpereiran/devbox-freeradius-server:latest"
 #image_name="jpereiran/devbox-freeradius-server:ubuntu_2004"
 docker_image="devbox-$image_os"
 
+uname_s="$(uname -s)"
+
 #
 #	Default docker options
 #
@@ -87,8 +89,6 @@ done
 #	Settings for X11 forward
 #
 if [ -z "$nox11" ]; then
-	uname_s="$(uname -s)"
-
 	xhost + 1> /dev/null 2>&1
 
 	case ${uname_s} in
@@ -134,6 +134,7 @@ if ! docker ps -a --format  '{{.Names}}' | grep -q "^$docker_image$"; then
 			-e "COLUMNS=$COLUMNS"                                  \
 			-e "LINES=$LINES"                                      \
 			-e "TERM=$TERM"                                        \
+			-e "HOST_OS=$uname_s"                                  \
 			-p 1812:1812/udp -p 1813:1813/udp -p 3799:3799/udp     \
 			-dti "$image_name" "${image_exec[@]}"
 	$debug_off
