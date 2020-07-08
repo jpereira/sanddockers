@@ -84,9 +84,9 @@ RUN aptitude install -fy screen vim wget ssl-cert gdb manpages-dev strace valgri
                         iputils-ping sudo lsof extrace
 
 #
-#	Heaptrack tool
+#	Heaptrack tool + misc
 #
-RUN aptitude install -fy heaptrack heaptrack-gui
+RUN aptitude install -fy heaptrack heaptrack-gui meld
 
 #
 #  Documentation build dependecies
