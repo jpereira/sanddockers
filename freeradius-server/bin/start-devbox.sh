@@ -46,7 +46,7 @@ while getopts 'adrpnPhsx:' OPTION; do
 		;;
 
 		r)
-			decho "Reset $docker_image container"
+			decho "Reset $docker_image container ($image_name})"
 			docker rm -f $docker_image 1> /dev/null 2>&1
 		;;
 
