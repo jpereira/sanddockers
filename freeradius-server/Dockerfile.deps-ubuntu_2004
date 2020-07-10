@@ -86,7 +86,7 @@ RUN aptitude install -fy screen vim wget ssl-cert gdb manpages-dev strace valgri
 #
 #	Heaptrack tool + misc
 #
-RUN aptitude install -fy heaptrack heaptrack-gui meld
+RUN aptitude install -fy heaptrack heaptrack-gui meld gnome-icon-theme
 
 #
 #  Documentation build dependecies
