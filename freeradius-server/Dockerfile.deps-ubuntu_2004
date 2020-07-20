@@ -30,12 +30,12 @@ RUN apt-get update && \
 #
 #   Update
 #
-RUN apt-get update
+RUN aptitude -f update
 
 #
 #   Utilities
 #
-RUN aptitude install -fy snmp snmpd dialog telnet netcat iproute2
+RUN aptitude install -fy snmp snmpd dialog telnet netcat iproute2 ldap-utils
 
 #
 #   Radsec dependencies
@@ -207,6 +207,13 @@ RUN for i in $(git for-each-ref --format='%(refname:short)' refs/remotes/origin 
 		git checkout $i; \
 		if [ -e ./debian/control.in ] ; then debian/rules debian/control ; fi ; echo 'y' | mk-build-deps -irt'apt-get -yV' debian/control ; \
 	done
+
+#
+#   We want the 'man pages'
+#
+# Do not exclude man pages & other documentation
+RUN rm -f /etc/dpkg/dpkg.cfg.d/excludes
+RUN yes | unminimize
 
 #
 #   Update
