@@ -1,0 +1,4 @@
+#%PAM-1.0
+auth       required /usr/lib/security/pam_tacplus.so server=127.0.0.1 secret=testing123
+account	   required /usr/lib/security/pam_tacplus.so server=127.0.0.1 secret=testing123 service=ppp protocol=ip
+session    required /usr/lib/security/pam_tacplus.so server=127.0.0.1 secret=testing123 service=ppp protocol=ip

@@ -216,6 +216,23 @@ RUN rm -f /etc/dpkg/dpkg.cfg.d/excludes
 RUN yes | unminimize
 
 #
+#	TACACS+ PAM stuff
+#
+RUN apt -fy install pamtester libpam-tacplus
+
+#
+#	TACACS+ Server
+#
+RUN apt -fy install flex bison libwrap0-dev
+RUN mkdir -p /etc/tacacs+
+RUN git clone https://github.com/jpereira/tacacs_plus /opt/src/tacacs_plus.git
+WORKDIR /opt/src/tacacs_plus.git
+RUN ./configure --prefix=/usr/local && make && make install
+
+COPY etc/tacacs+/tac_plus.conf /etc/tacacs+/tac_plus.conf
+COPY etc/pam.d/test /etc/pam.d/test
+
+#
 #   Update
 #
 RUN apt-get update; true

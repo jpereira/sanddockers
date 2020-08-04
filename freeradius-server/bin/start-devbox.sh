@@ -133,9 +133,9 @@ fi
 
 mkdir -p $docker_rootfs
 
-if [ -d "$docker_rootfs" ]; then
-	extra_opts+=" -v $docker_rootfs:/opt"
-fi
+#if [ -d "$docker_rootfs" ]; then
+#	extra_opts+=" -v $docker_rootfs:/opt"
+#fi
 
 if ! docker ps -a --format  '{{.Names}}' | grep -q "^$docker_image$"; then
 	decho "Lauching new instance"
