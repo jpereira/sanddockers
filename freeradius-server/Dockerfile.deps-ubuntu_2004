@@ -53,7 +53,7 @@ RUN aptitude install -fy cmake devscripts equivs git git-lfs quilt build-essenti
 			libosmo-abis-dev \
 			libosmo-fl2k-dev libosmo-legacy-mgcp-dev libosmo-mgcp-client-dev libosmo-netif-dev \
 			libosmo-ranap-dev libosmo-sccp-dev libosmo-sigtran-dev libosmocore-dev libosmosdr-dev \
-			libidn11-dev libidn11-dev firebird-dev
+			libidn11-dev libidn11-dev firebird-dev xutils-dev
 
 #
 #   eapol_test dependencies
