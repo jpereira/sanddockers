@@ -231,7 +231,12 @@ RUN apt -fy install pamtester libpam-tacplus
 #
 #COPY etc/tacacs+/tac_plus.conf /etc/tacacs+/tac_plus.conf
 #COPY etc/pam.d/test /etc/pam.d/test
+
 #
+#	TACACS+ Plus
+#
+RUN pip3 install tacacs_plus
+
 #
 #   Update
 #
