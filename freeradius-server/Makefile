@@ -1,7 +1,7 @@
 DOCKER := docker
 DOCKET_OPTS :=
 
-DIST := ubuntu_2004
+DIST := ubuntu_2104
 
 all: 
 	$(DOCKER) build $(DOCKER_OPTS) "$(PWD)" -f "Dockerfile.deps-$(DIST)" -t jpereiran/devbox-freeradius-server:latest

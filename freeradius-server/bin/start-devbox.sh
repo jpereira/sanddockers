@@ -15,7 +15,7 @@ cwd="/root/Devel/FreeRADIUS/freeradius-server.git"
 arg0="$(basename $0)"
 
 image_exec="/bin/bash"
-image_os="freeradius-server-ubuntu_2004"
+image_os="freeradius-server-ubuntu_2104"
 image_name="jpereiran/devbox-freeradius-server:latest"
 #image_name="jpereiran/devbox-freeradius-server:ubuntu_2004"
 docker_image="devbox-$image_os"
@@ -140,7 +140,7 @@ mkdir -p $docker_rootfs
 if ! docker ps -a --format  '{{.Names}}' | grep -q "^$docker_image$"; then
 	decho "Lauching new instance"
 	$debug_on
-	docker run ${docker_opts[*]} --name="$docker_image"            \
+	docker run ${docker_opts[*]} --name="$docker_image"                    \
 			${x11_args[*]}                                         \
 			${extra_opts[*]}                                       \
 			-h "$docker_image"                                     \
