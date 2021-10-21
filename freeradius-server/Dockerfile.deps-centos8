@@ -1,0 +1,256 @@
+#
+#	Author: Jorge Pereira <jpereira@freeradius.org>
+#   Desc: Freeradius Development Box
+#
+ARG from=centos:centos8
+FROM ${from} as build
+
+LABEL maintainer "Jorge Pereira <jpereira@freeradius.org>"
+
+ARG osname=hirsute
+ARG gccver=11
+ARG clangver=11
+
+ARG DEBIAN_FRONTEND=noninteractive
+ENV CC=clang
+
+# Seems to work around https://bugs.centos.org/view.php?id=16655
+RUN rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+
+RUN cd /tmp && curl -o RPM-GPG-KEY-redhat-devel https://www.redhat.com/security/data/a5787476.txt && \
+	rpm --import RPM-GPG-KEY-redhat-devel
+#
+#  Install build tools
+#
+RUN yum groupinstall -y "Development Tools"
+RUN yum install -y rpmdevtools openssl dnf-utils
+
+#
+#  Create build directory
+#
+RUN mkdir -p /usr/local/src/repositories
+WORKDIR /usr/local/src/repositories
+
+#
+#  Other requirements
+#
+
+# Use LTB's openldap packages intead of the distribution version to avoid linking against NSS
+RUN echo $'[ltb-project]\n\
+name=LTB project packages\n\
+baseurl=https://ltb-project.org/rpm/$releasever/$basearch\n\
+enabled=1\n\
+gpgcheck=1\n\
+gpgkey=file:///etc/pki/rpm-gpg/RPM-GPG-KEY-LTB-project'\
+> /etc/yum.repos.d/ltb-project.repo \
+    && rpm --import https://ltb-project.org/lib/RPM-GPG-KEY-LTB-project \
+    \
+# EPEL repository for freetds and hiredis
+    && yum install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm \
+    && yum install -y dnf-utils \
+    && yum config-manager --enable epel-testing
+
+RUN yum config-manager --enable powertools
+# Currently needed for hiredis-devel
+RUN yum config-manager --enable epel-testing
+
+#
+#   Update
+#
+RUN yum update -y
+
+#
+#   Utilities
+#
+#
+#	Usual commands.
+#
+RUN yum install -y screen vim wget gdb strace valgrind psmisc htop openssh-server tcpdump net-tools \
+                   sudo lsof dialog telnet netcat
+
+#
+#   Radsec dependencies
+#
+RUN yum install -y radsecproxy
+
+#
+#   Development utilities
+#
+RUN yum install -y nettle-devel \
+			cmake git git-lfs quilt moreutils \
+			google-perftools
+
+#
+#   eapol_test dependencies
+#
+RUN yum install -y libnl3-devel
+
+#
+# 	Fix locale
+#
+RUN dnf install -y langpacks-en glibc-all-langpacks glibc-langpack-en.x86_64
+RUN echo "override_install_langs=en_US.utf8" >> /etc/yum.conf
+ENV LANG en_US.UTF-8 
+
+#
+#	Heaptrack tool + misc
+#
+#RUN yum install -y heaptrack heaptrack-gui meld
+RUN yum install -y meld mesa-libGL
+
+#
+#  Documentation build dependecies
+#
+
+#  - doxygen & JSON.pm
+RUN yum install -y doxygen graphviz json-c-devel cjson-devel perl-JSON
+
+#  - antora (npm needed)
+RUN yum install -y nodejs npm
+RUN npm i -g @antora/cli@2.1 @antora/site-generator-default@2.1
+
+#  - pandoc
+WORKDIR /tmp
+#RUN curl -OL $(curl -s https://api.github.com/repos/jgm/pandoc/releases/latest | grep "browser_download_url.*amd64.*deb" | cut -d '"' -f 4)
+#RUN rpm -ivh /tmp/pandoc-*.deb
+RUN yum install -y pandoc
+
+#  - asciidoctor
+RUN yum install -y ruby-devel gem
+RUN gem install asciidoctor
+
+#
+#	Devel tool
+#
+RUN dnf install -y bison clang flex git llvm make maven swig cmake clang-devel \
+					gcc gcc-c++ java-11-openjdk-devel libxml2-devel llvm-devel llvm-static \
+					ncurses-devel openmotif openmotif-devel perl perl-Digest-MD5 udunits2 \
+					udunits2-devel which zlib-devel python3-devel diffutils \
+                    perl-DBI perl-Net-IP mysql postgresql openssl-perl net-snmp \
+                    selinux-policy
+
+#
+#   Voltron debug env
+#
+RUN yum install -y python3-pip
+RUN pip3 install voltron
+
+#
+#	CouchBase
+#
+RUN echo "[couchbase]" > /etc/yum.repos.d/couchbase.repo
+RUN echo "enabled = 1" >> /etc/yum.repos.d/couchbase.repo
+RUN echo "name = libcouchbase package for centos8 x86_64" >> /etc/yum.repos.d/couchbase.repo
+RUN echo "baseurl = https://packages.couchbase.com/clients/c/repos/rpm/el8/x86_64" >> /etc/yum.repos.d/couchbase.repo
+RUN echo "gpgcheck = 1" >> /etc/yum.repos.d/couchbase.repo
+RUN echo "gpgkey = https://packages.couchbase.com/clients/c/repos/rpm/couchbase.key" >> /etc/yum.repos.d/couchbase.repo
+RUN yum install -y libcouchbase3-libev libcouchbase3-tools
+
+#
+#	Luajit
+#
+#RUN mkdir -p /tmp/luajit
+#WORKDIR /tmp/luajit
+#RUN for i in http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-2_2.0.4%2Bdfsg-1_amd64.deb \
+#	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-common_2.0.4%2Bdfsg-1_all.deb \
+#	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-dev_2.0.4%2Bdfsg-1_amd64.deb \
+#	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/luajit_2.0.4%2Bdfsg-1_amd64.deb; do wget -4 $i; done
+#RUN dpkg -i /tmp/luajit/*.deb
+RUN yum install -y luajit-devel
+
+#
+#  Grab libkqueue and build
+#
+RUN mkdir -p /usr/src/libkqueue-pkg
+WORKDIR /usr/src/libkqueue-pkg
+RUN git clone --branch master --depth=1 https://github.com/mheily/libkqueue.git
+
+WORKDIR libkqueue
+RUN cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib ./ && \
+    make && \
+    cpack -G RPM && \
+    rpm -ivh ./libkqueue*.rpm
+
+#
+#  Shallow clone the FreeRADIUS source
+#
+ARG source=https://github.com/FreeRADIUS/freeradius-server.git
+#ARG release=v3.0.x
+ARG release=master
+
+RUN git clone --depth 1 --single-branch --branch ${release} ${source}
+WORKDIR freeradius-server
+
+#
+#  Install build dependencies
+#
+RUN [ -e redhat/freeradius.spec ] && yum-builddep -y redhat/freeradius.spec
+
+#
+#	TACACS+ PAM stuff
+#
+RUN yum install -y pamtester
+#RUN yum install -y pamtester libpam-tacplus
+
+#
+#	TACACS+ Server
+#
+#RUN yum install -y flex bison libwrap0-dev
+#RUN mkdir -p /etc/tacacs+
+#RUN git clone https://github.com/jpereira/tacacs_plus /opt/src/tacacs_plus.git
+#WORKDIR /opt/src/tacacs_plus.git
+#RUN ./configure --prefix=/usr/local && make && make install
+#
+#COPY etc/tacacs+/tac_plus.conf /etc/tacacs+/tac_plus.conf
+#COPY etc/pam.d/test /etc/pam.d/test
+
+#
+#	TACACS+ Plus
+#
+RUN pip3 install tacacs_plus
+
+#
+#   Jorge's dotfiles
+#
+# Persist envs
+WORKDIR /root
+RUN git clone https://github.com/jpereira/dotfiles/ dotfiles.git
+WORKDIR dotfiles.git
+RUN ./install.sh run
+
+#
+#	Fix /etc/hosts
+#
+#RUN sed -i '/^127.*localhost/s/$/ devbox-freeradius-server-ubuntu_centos8/g' /etc/hosts 
+
+#
+#   Copy the things
+#
+RUN mkdir -p /opt/local/bin
+COPY bin/* /usr/local/bin/
+
+#
+#   Profile scripts
+#
+RUN mkdir -p /etc/profile.d
+COPY etc/bin2path.sh /etc/profile.d
+
+#
+#   Clean up
+#
+RUN rm -rf /usr/share/sgml/ /usr/share/doc/
+
+#
+#  Another volume
+#
+VOLUME ["/sandbox"]
+
+#
+#   Default HOME
+#
+WORKDIR /root/Devel
+
+#
+#   Usual ports auth/accounting/coa
+#
+EXPOSE 1812/udp 1812/tcp 1813/udp 1813/tcp 3799/udp

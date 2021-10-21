@@ -15,9 +15,15 @@ cwd="/root/Devel/FreeRADIUS/freeradius-server.git"
 arg0="$(basename $0)"
 
 image_exec="/bin/bash"
-image_os="freeradius-server-ubuntu_2104"
-image_name="jpereiran/devbox-freeradius-server:latest"
-#image_name="jpereiran/devbox-freeradius-server:ubuntu_2004"
+
+if [ "$DIST" = "centos" ]; then
+	image_os="freeradius-server-centos8"
+	image_name="jpereiran/devbox-freeradius-server:centos8"
+else
+	image_os="freeradius-server-ubuntu_2104"
+	image_name="jpereiran/devbox-freeradius-server:ubuntu_2104"
+fi
+
 docker_image="devbox-$image_os"
 
 uname_s="$(uname -s)"
@@ -28,7 +34,8 @@ uname_s="$(uname -s)"
 decho() {
 	echo "$arg0: [**] $@"
 }
-
+			debug_on="set -fx"
+			debug_off="set +fx"
 #
 #	Check opts
 #
@@ -122,9 +129,9 @@ if [ -z "$nox11" ]; then
 				exit 1
 			fi
 
-			decho "Starting - socat TCP-LISTEN:6000,bind=${ipaddr4},reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\""
+			decho "Starting - socat TCP-LISTEN:6000,bind=0.0.0.0,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\""
 			killall -9 socat 1> /dev/null 2>&1
-			socat TCP-LISTEN:6000,bind=${ipaddr4},reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" &
+			socat TCP-LISTEN:6000,bind=0.0.0.0,reuseaddr,fork UNIX-CLIENT:\"$DISPLAY\" &
 		;;
 	esac
 
