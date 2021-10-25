@@ -234,6 +234,7 @@ COPY bin/* /usr/local/bin/
 #
 RUN mkdir -p /etc/profile.d
 COPY etc/bin2path.sh /etc/profile.d
+COPY etc/securetty /etc/securetty
 
 #
 #   Clean up

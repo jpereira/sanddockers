@@ -237,6 +237,11 @@ RUN apt install -y pamtester libpam-tacplus
 RUN pip3 install tacacs_plus
 
 #
+#	Extra services
+#
+RUN apt-get install -y syslog-ng
+
+#
 #   Update
 #
 RUN apt-get update; true
@@ -270,6 +275,7 @@ COPY bin/* /usr/local/bin/
 #   Profile scripts
 #
 COPY etc/bin2path.sh /etc/profile.d
+COPY etc/securetty /etc/securetty
 
 #
 #  Install build dependencies for all branches from v3 onwards
@@ -282,6 +288,12 @@ ARG APT_OPTS="-y --option=Dpkg::options::=--force-unsafe-io --no-install-recomme
 #		git checkout $i; \
 #		if [ -e ./debian/control.in ] ; then debian/rules debian/control ; fi ; echo 'y' | mk-build-deps -irt'apt-get -yV' debian/control ; \
 #	done
+
+#
+#	Add ubuntu user
+#
+RUN groupadd ubuntu && \
+	useradd -rm -d /home/ubuntu -s /bin/bash -g ubuntu -p "$(openssl passwd -1 ubuntu)" ubuntu
 
 #
 #  Another volume
