@@ -55,6 +55,12 @@ RUN apt-get install -y cmake devscripts equivs git git-lfs quilt build-essential
 			libosmo-ranap-dev libosmo-sccp-dev libosmo-sigtran-dev libosmocore-dev libosmosdr-dev
 
 #
+#	Pam for pam_auth.git
+#
+RUN apt-get install -y libpam0g-dev
+
+#
+#
 #   eapol_test dependencies
 #
 RUN apt-get install -y libnl-3-dev libnl-genl-3-dev
