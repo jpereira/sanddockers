@@ -57,7 +57,11 @@ RUN apt-get install -y cmake devscripts equivs git git-lfs quilt build-essential
 #
 #	Pam for pam_auth.git
 #
-RUN apt-get install -y libpam0g-dev
+RUN apt-get install -y libpam0g-dev libpcap-dev libjson-perl libcap-dev libcap-ng-dev \
+			libgdbm-dev libjson-c-dev libmemcached-dev libkrb5-dev libwbclient-dev libwbclient-sssd-dev \
+			libmysqlclient-dev libsqlite3-dev libykclient-dev libmongoc-dev libmongoclient-dev libctl-dev \
+			libperl-dev libpython3-all-dev libldap2-dev libpq-dev libhiredis-dev libcurl4-openssl-dev \
+			python3-binary-memcached libodbc1
 
 #
 #
