@@ -162,7 +162,7 @@ if ! docker ps -a --format  '{{.Names}}' | grep -q "^$docker_image$"; then
 			-e "TERM=$TERM"                                        \
 			-e "HOST_OS=$uname_s"                                  \
 			-p 1812:1812/udp -p 1813:1813/udp -p 3799:3799/udp     \
-			-p 1589:1589/udp \
+			-p 1589:1589/udp -p 1234:1234 \
 			-dti "$image_name" "${image_exec[@]}"
 	$debug_off
 else
