@@ -90,7 +90,7 @@ ENV LANG en_US.UTF-8
 #
 RUN apt-get install -y screen vim wget ssl-cert gdb manpages-dev strace valgrind sysdig \
                         psmisc htop openssh-server tcpdump net-tools sysvbanner \
-                        iputils-ping sudo lsof extrace
+                        iputils-ping sudo lsof extrace sshpass
 
 #
 #	Heaptrack tool + misc
