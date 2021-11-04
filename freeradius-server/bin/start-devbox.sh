@@ -10,10 +10,12 @@ fi
 export LC_ALL=C
 export SSH_AUTH_SOCK_PATH="$(dirname $SSH_AUTH_SOCK)"
 
+#docker_opts="--ipv6=true --fixed-cidr-v6=2001:db8:1::/64 "
+
 docker_rootfs="$HOME/Docker/storage/freeradius/"
 cwd="/root/Devel/FreeRADIUS/freeradius-server.git"
 arg0="$(basename $0)"
-
+uname_s="$(uname -s)"
 image_exec="/bin/bash"
 
 if [ "$DIST" = "centos" ]; then
@@ -25,8 +27,8 @@ else
 fi
 
 docker_image="devbox-$image_os"
-
-uname_s="$(uname -s)"
+debug_on="set -fx"
+debug_off="set +fx"
 
 #
 #	Default docker options
@@ -34,8 +36,7 @@ uname_s="$(uname -s)"
 decho() {
 	echo "$arg0: [**] $@"
 }
-			debug_on="set -fx"
-			debug_off="set +fx"
+
 #
 #	Check opts
 #
@@ -63,8 +64,9 @@ while getopts 'adrpnPhsx:' OPTION; do
 		;;
 
 		n)
-			decho "Enabling --net=host"
+			decho "Enabling --net=testv6"
 			extra_opts+="--net=host "
+#			extra_opts+="--net=testv6 --ip6 fe80::1c12:5ff:feca:fe09 "
 		;;
 
 		P)
@@ -123,6 +125,17 @@ if [ -z "$nox11" ]; then
 			cwd="${cwd}-linux"
 			x11_args="-e DISPLAY=${ipaddr4}:0"
 			x11_unix="${DISPLAY}"
+
+			# Check if the Docker is started?
+			if ! cat /var/run/docker.sock 1> /dev/null 2>&1; then
+				decho "Docker is stopped. Let's start up"
+				open --background -a Docker
+				while ! (cat /var/run/docker.sock 1> /dev/null 2>&1); do
+					sleep 1
+				done
+				sleep 20
+				decho "Done"
+			fi
 
 			if [ ! -e "${x11_unix}" ]; then
 				decho "ERROR: Can't set up the x11 due to ${x11_unix} not exist"
