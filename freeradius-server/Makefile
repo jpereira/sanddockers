@@ -23,8 +23,8 @@ pull.centos:
 	$(DOCKER) pull $(DOCKER_OPTS) jpereiran/devbox-freeradius-server:$(DIST_CENTOS)
 
 
-build: build.centos build.ubuntu
+build: build.ubuntu build.centos
 
-push: build push.centos push.ubuntu
+push: build push.ubuntu push.centos
 
-pull: pull.centos pull.ubuntu
+pull: pull.ubuntu pull.centos
