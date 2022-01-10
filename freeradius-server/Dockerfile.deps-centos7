@@ -2,7 +2,7 @@
 #	Author: Jorge Pereira <jpereira@freeradius.org>
 #   Desc: Freeradius Development Box
 #
-ARG from=centos:centos8
+ARG from=centos:centos7
 FROM ${from} as build
 
 LABEL maintainer "Jorge Pereira <jpereira@freeradius.org>"
