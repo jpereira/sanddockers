@@ -200,6 +200,19 @@ RUN cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR
     dpkg -i --force-all ./libkqueue*.deb
 
 #
+#  Grab & Install OpenSSL 3.0x in /opt/openssl
+#
+ENV OPENSSL_VERSION=3.0.1
+
+WORKDIR /opt/src
+RUN wget https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
+RUN tar xzf openssl-${OPENSSL_VERSION}.tar.gz
+WORKDIR openssl-${OPENSSL_VERSION}
+RUN ./Configure --prefix=/opt/openssl --openssldir=.
+RUN make -j `nproc` && make install
+
+#
+#
 #  Shallow clone the FreeRADIUS source
 #
 WORKDIR /opt/src
