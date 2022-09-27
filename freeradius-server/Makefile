@@ -1,7 +1,9 @@
 DOCKER := docker
 DOCKET_OPTS :=
 
-DIST_UBUNTU := ubuntu_2104
+DIST_UBUNTU := ubuntu_2204
+#DIST_UBUNTU := ubuntu_2104
+#DIST_UBUNTU := ubuntu_2004
 
 build.ubuntu:
 	$(DOCKER) build $(DOCKER_OPTS) "$(PWD)" -f "Dockerfile.deps-$(DIST_UBUNTU)" -t jpereiran/devbox-freeradius-server:$(DIST_UBUNTU)
@@ -32,9 +34,18 @@ push.centos8:
 pull.centos8:
 	$(DOCKER) pull $(DOCKER_OPTS) jpereiran/devbox-freeradius-server:centos8
 
+build.rocky8:
+	$(DOCKER) build $(DOCKER_OPTS) "$(PWD)" -f "Dockerfile.deps-rocky8" -t jpereiran/devbox-freeradius-server:rocky8
 
-build: build.ubuntu build.centos8 build.centos7
+push.rocky8:
+	$(DOCKER) push $(DOCKER_OPTS) jpereiran/devbox-freeradius-server:rocky8
 
-push: build push.ubuntu push.centos8 push.centos7
+pull.rocky8:
+	$(DOCKER) pull $(DOCKER_OPTS) jpereiran/devbox-freeradius-server:rocky8
 
-pull: pull.ubuntu pull.centos8
+build: build.ubuntu build.rocky8 build.centos8 build.centos7
+
+push: build push.ubuntu push.rocky8 push.centos8 push.centos7
+
+pull: pull.ubuntu pull.rocky8 pull.centos8
+	

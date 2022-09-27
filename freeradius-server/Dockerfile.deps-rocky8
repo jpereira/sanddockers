@@ -2,7 +2,7 @@
 #	Author: Jorge Pereira <jpereira@freeradius.org>
 #   Desc: Freeradius Development Box
 #
-ARG from=centos:centos8
+ARG from=rockylinux/rockylinux:8
 FROM ${from} as build
 
 LABEL maintainer "Jorge Pereira <jpereira@freeradius.org>"
@@ -14,27 +14,11 @@ ARG clangver=11
 ARG DEBIAN_FRONTEND=noninteractive
 ENV CC=clang
 
-#
-# Hack: https://stackoverflow.com/questions/70926799/centos-through-vm-no-urls-in-mirrorlist
-#
-RUN sed -i 's/mirrorlist/#mirrorlist/g' /etc/yum.repos.d/CentOS-Linux-*
-RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|g' /etc/yum.repos.d/CentOS-Linux-*
-
 # Seems to work around https://bugs.centos.org/view.php?id=16655
-RUN rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-centosofficial
+RUN rpmkeys --import /etc/pki/rpm-gpg/RPM-GPG-KEY-rockyofficial
 
 RUN cd /tmp && curl -o RPM-GPG-KEY-redhat-devel https://www.redhat.com/security/data/a5787476.txt && \
 	rpm --import RPM-GPG-KEY-redhat-devel
-
-#
-# Converting from CentOS Linux 8 to CentOS Stream 8 is the "official" process
-# (see centos.org/centos-stream/#centos-stream-8):
-#
-RUN yum upgrade -y
-RUN yum -y --disablerepo '*' --enablerepo extras swap centos-linux-repos centos-stream-repos
-RUN yum clean all && yum makecache
-RUN yum distro-sync -y --allowerasing
-
 #
 #  Install build tools
 #

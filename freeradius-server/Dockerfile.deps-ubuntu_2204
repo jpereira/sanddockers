@@ -2,13 +2,13 @@
 #	Author: Jorge Pereira <jpereira@freeradius.org>
 #   Desc: Freeradius Development Box
 #
-FROM ubuntu:21.04
+FROM --platform=linux/amd64 ubuntu:22.04
 
 LABEL maintainer "Jorge Pereira <jpereira@freeradius.org>"
 
 ARG osname=hirsute
-ARG gccver=11
-ARG clangver=11
+ARG gccver=14
+ARG clangver=14
 
 ARG DEBIAN_FRONTEND=noninteractive
 ENV CC=clang
@@ -47,7 +47,6 @@ RUN apt-get install -y nettle-dev
 #
 RUN apt-get install -y cmake devscripts equivs git git-lfs quilt build-essential moreutils \
 			google-perftools libgoogle-perftools-dev \
-			libcollectdclient-dev \
 			libosmo-sccp-dev \
 			libunbound-dev \
 			libidn11-dev libidn11-dev firebird-dev xutils-dev \
@@ -58,7 +57,7 @@ RUN apt-get install -y cmake devscripts equivs git git-lfs quilt build-essential
 #	Pam for pam_auth.git
 #
 RUN apt-get install -y libpam0g-dev libpcap-dev libjson-perl libcap-dev libcap-ng-dev \
-			libgdbm-dev libjson-c-dev libmemcached-dev libkrb5-dev libwbclient-dev libwbclient-sssd-dev \
+			libgdbm-dev libjson-c-dev libmemcached-dev libkrb5-dev libwbclient-dev \
 			libmysqlclient-dev libsqlite3-dev libykclient-dev libmongoc-dev libmongoclient-dev libctl-dev \
 			libperl-dev libpython3-all-dev libldap2-dev libpq-dev libhiredis-dev libcurl4-openssl-dev \
 			python3-binary-memcached libodbc1
@@ -88,7 +87,7 @@ ENV LANG en_US.UTF-8
 #
 #	Usual commands.
 #
-RUN apt-get install -y screen vim wget ssl-cert gdb manpages-dev strace valgrind sysdig \
+RUN apt-get install -y screen vim wget ssl-cert gdb manpages-dev strace valgrind \
                         psmisc htop openssh-server tcpdump net-tools sysvbanner \
                         iputils-ping sudo lsof extrace sshpass
 
@@ -107,11 +106,11 @@ RUN apt-get install -y doxygen graphviz libjson-perl
 #RUN curl -sL https://deb.nodesource.com/setup_12.x | bash -
 #RUN apt-get install -y nodejs npm
 RUN apt-get install -y npm
-RUN npm i -g @antora/cli@2.1 @antora/site-generator-default@2.1
+RUN npm i -g @antora/cli@3.1 @antora/site-generator-default@3.1
 #  - pandoc
 WORKDIR /tmp
-RUN curl -OL $(curl -s https://api.github.com/repos/jgm/pandoc/releases/latest | grep "browser_download_url.*amd64.*deb" | cut -d '"' -f 4)
-RUN apt-get install -f -y /tmp/pandoc-*.deb
+#RUN curl -OL $(curl -s https://api.github.com/repos/jgm/pandoc/releases/latest | grep "browser_download_url.*amd64.*deb" | cut -d '"' -f 4)
+#RUN apt-get install -f -y /tmp/pandoc-*.deb
 #  - asciidoctor
 RUN apt-get install -y ruby-dev
 RUN gem install asciidoctor
@@ -120,7 +119,7 @@ RUN gem install asciidoctor
 #
 #	Clang (compiler)
 #
-RUN wget -4 -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+RUN wget -4 -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key --keyring /etc/apt/trusted.gpg.d/llvm.gpg add -
 RUN echo "# Created at $(date)" > /etc/apt/sources.list.d/llvm${clangver}-org.list
 RUN echo "deb http://apt.llvm.org/${osname}/ llvm-toolchain-${osname} main" >> /etc/apt/sources.list.d/llvm${clangver}-org.list
 RUN echo "deb-src http://apt.llvm.org/${osname}/ llvm-toolchain-${osname} main" >> /etc/apt/sources.list.d/llvm${clangver}-org.list
@@ -148,7 +147,6 @@ RUN apt-get install -y libomp-${clangver}-dev
 RUN update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${clangver} 1000
 RUN update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer /usr/bin/llvm-symbolizer-${clangver} 1000
 RUN update-alternatives --install /bin/lldb lldb /bin/lldb-${clangver} 1000
-RUN ln -fs /lib/x86_64-linux-gnu/libgcc_s.so.1 /lib64/libgcc_s.so.1
 
 #
 #   Voltron debug env
@@ -157,23 +155,15 @@ RUN apt-get install -y python3-pip
 RUN pip3 install voltron
 
 #
-#	CouchBase
-#
-RUN wget -4 -O - http://packages.couchbase.com/ubuntu/couchbase.key | apt-key add -
-RUN echo "deb http://packages.couchbase.com/ubuntu bionic bionic/main" | tee /etc/apt/sources.list.d/couchbase.list
-RUN apt-get update
-RUN aptitude install -y libcouchbase-dev libcouchbase2-bin
-
-#
 #	Luajit
 #
 RUN mkdir -p /tmp/luajit
-WORKDIR /tmp/luajit
-RUN for i in http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-2_2.0.4%2Bdfsg-1_amd64.deb \
-	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-common_2.0.4%2Bdfsg-1_all.deb \
-	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-dev_2.0.4%2Bdfsg-1_amd64.deb \
-	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/luajit_2.0.4%2Bdfsg-1_amd64.deb; do wget -4 $i; done
-RUN dpkg -i /tmp/luajit/*.deb
+#WORKDIR /tmp/luajit
+#RUN for i in http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-2_2.0.4%2Bdfsg-1_amd64.deb \
+#	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-common_2.0.4%2Bdfsg-1_all.deb \
+#	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-dev_2.0.4%2Bdfsg-1_amd64.deb \
+#	http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/luajit_2.0.4%2Bdfsg-1_amd64.deb; do wget -4 $i; done
+#RUN dpkg -i /tmp/luajit/*.deb
 #
 #  Setup a src dir in /usr/local
 #
@@ -202,7 +192,7 @@ RUN cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR
 #
 #  Grab & Install OpenSSL 3.0x in /opt/openssl
 #
-ENV OPENSSL_VERSION=3.0.1
+ENV OPENSSL_VERSION=3.0.5
 
 WORKDIR /opt/src
 RUN wget https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
@@ -212,13 +202,21 @@ RUN ./Configure --prefix=/opt/openssl --openssldir=.
 RUN make -j `nproc` && make install
 
 #
+#	CouchBase
+#
+RUN wget -4 -O - https://packages.couchbase.com/clients/c/repos/deb/couchbase.key | apt-key --keyring /etc/apt/trusted.gpg.d/couchbase.gpg add -
+RUN mkdir -p /etc/apt/sources.list.d/
+RUN echo "deb [arch=amd64] https://packages.couchbase.com/clients/c/repos/deb/ubuntu2004 focal focal/main" > /etc/apt/sources.list.d/couchbase.list
+RUN apt update
+RUN aptitude -fy install libcouchbase3 libcouchbase3-tools libcouchbase-dev
+
+#
 #
 #  Shallow clone the FreeRADIUS source
 #
 WORKDIR /opt/src
 ARG source=https://github.com/FreeRADIUS/freeradius-server.git
 RUN git clone --depth 1 --no-single-branch ${source}
-#RUN git clone ${source}
 
 #
 #   We want the 'man pages'

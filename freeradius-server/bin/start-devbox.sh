@@ -2,6 +2,8 @@
 # Author: Jorge Pereira <jpereira@freeradius.org>
 #
 
+#set -fx
+
 if [ -z "$SSH_AUTH_SOCK" ]; then
 	echo "ERRO: SSH_AUTH_SOCK ??? call ssh-agent"
 	exit 1
@@ -22,8 +24,8 @@ if [ "$DIST" = "centos" ]; then
 	image_os="freeradius-server-centos8"
 	image_name="jpereiran/devbox-freeradius-server:centos8"
 else
-	image_os="freeradius-server-ubuntu_2104"
-	image_name="jpereiran/devbox-freeradius-server:ubuntu_2104"
+	image_os="freeradius-server-ubuntu_2204"
+	image_name="jpereiran/devbox-freeradius-server:ubuntu_2204"
 fi
 
 docker_image="devbox-$image_os"
@@ -127,15 +129,15 @@ if [ -z "$nox11" ]; then
 			x11_unix="${DISPLAY}"
 
 			# Check if the Docker is started?
-			if ! cat /var/run/docker.sock 1> /dev/null 2>&1; then
-				decho "Docker is stopped. Let's start up"
-				open --background -a Docker
-				while ! (cat /var/run/docker.sock 1> /dev/null 2>&1); do
-					sleep 1
-				done
-				sleep 20
-				decho "Done"
-			fi
+			#if ! cat /var/run/docker.sock 1> /dev/null 2>&1; then
+			#	decho "Docker is stopped. Let's start up"
+			#	open -gj --background -a Docker
+			#	while ! (cat /var/run/docker.sock 1> /dev/null 2>&1); do
+			#		sleep 1
+			#	done
+			#	sleep 20
+			#	decho "Done"
+			#fi
 
 			if [ ! -e "${x11_unix}" ]; then
 				decho "ERROR: Can't set up the x11 due to ${x11_unix} not exist"
