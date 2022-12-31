@@ -1,0 +1,284 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+# Author: Jorge Pereira <jpereira@freeradius.org>
+# Desc: Linux Ubuntu 22.04 image
+#
+
+Vagrant.configure("2") do |config|
+    # virtualbox
+#  config.vm.box = "ubuntu/kinetic64"
+
+  # libvirt
+  config.vm.box = "perk/ubuntu-2204-arm64"
+  config.vm.box_version = "20221201"
+
+  config.vm.provider "virtualbox" do |vb|
+    vb.gui = false
+
+    config.vm.hostname     = "vm-ubuntu22.10"
+    config.vm.guest        = :linux
+    config.vm.boot_timeout = 60
+
+    config.ssh.shell    = "bash"
+    config.ssh.host     = "localhost"
+    config.ssh.username = "vagrant"
+    config.ssh.password = "vagrant"
+    config.ssh.insert_key = false
+#     vb.customize ["modifyvm", :id, "--cableconnected1", "on"]
+  end
+
+  config.vm.provision "shell", inline: "echo hello", privileged: false
+  config.vm.provision "shell", inline: <<-SHELL
+    export osname=hirsute
+    export gccver=14
+    export clangver=14
+    export DEBIAN_FRONTEND=noninteractive
+    export CC=clang
+
+    # sed -i 's/ChallengeResponseAuthentication no/ChallengeResponseAuthentication yes/g' /etc/sshd/sshd_config
+    # sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/g' /etc/sshd/sshd_config
+    # service sshd restart
+
+    #
+    #   Disable apt-get over ipv6
+    #
+    echo 'Acquire::ForceIPv4 "true";' | tee /etc/apt/apt.conf.d/99force-ipv4
+
+    #
+    #  Install add-apt-repository
+    #
+    sed 's/archive.ubuntu.com/br.archive.ubuntu.com/g' -i /etc/apt/sources.list
+    apt-get update && \
+        apt-get install -y software-properties-common aptitude apt-utils && \
+        apt-get clean && \
+        rm -r /var/lib/apt/lists/*
+
+    #
+    #   Update
+    #
+    apt-get update
+
+    #
+    #   Utilities
+    #
+    apt-get install -y snmp snmpd dialog telnet netcat iproute2 ldap-utils
+
+    #
+    #   Radsec dependencies
+    #
+    apt-get install -y nettle-dev
+
+    #
+    #   Development utilities
+    #
+    apt-get install -y cmake devscripts equivs git git-lfs quilt build-essential moreutils \
+          google-perftools libgoogle-perftools-dev \
+          libosmo-sccp-dev \
+          libunbound-dev \
+          libidn11-dev libidn11-dev firebird-dev xutils-dev \
+          libosmo-abis-dev libosmo-fl2k-dev libosmo-mgcp-client-dev libosmo-netif-dev \
+          libosmo-ranap-dev libosmo-sccp-dev libosmo-sigtran-dev libosmocore-dev libosmosdr-dev
+
+    #
+    # Pam for pam_auth.git
+    #
+    apt-get install -y libpam0g-dev libpcap-dev libjson-perl libcap-dev libcap-ng-dev \
+          libgdbm-dev libjson-c-dev libmemcached-dev libkrb5-dev libwbclient-dev \
+          libmysqlclient-dev libsqlite3-dev libykclient-dev libmongoc-dev libmongoclient-dev libctl-dev \
+          libperl-dev libpython3-all-dev libldap2-dev libpq-dev libhiredis-dev libcurl4-openssl-dev \
+          python3-binary-memcached libodbc1
+
+    #
+    #
+    #   eapol_test dependencies
+    #
+    apt-get install -y libnl-3-dev libnl-genl-3-dev
+
+    #
+    #   Install the radsecproxy
+    #
+    apt-get install -y radsecproxy
+
+    #
+    #   Fix locale
+    #
+    apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y locales apt-utils
+
+    sed -i -e 's/# en_US.UTF-8 UTF-8/en_US.UTF-8 UTF-8/' /etc/locale.gen && \
+        dpkg-reconfigure --frontend=noninteractive locales && \
+        update-locale LANG=en_US.UTF-8
+
+    export LANG=en_US.UTF-8 
+
+    #
+    # Usual commands.
+    #
+    apt-get install -y screen vim wget ssl-cert gdb manpages-dev strace valgrind \
+                            psmisc htop openssh-server tcpdump net-tools sysvbanner \
+                            iputils-ping sudo lsof extrace sshpass
+
+    #
+    # Heaptrack tool + misc
+    #
+    apt-get install -y heaptrack heaptrack-gui meld gnome-icon-theme
+
+    #
+    # Clang (compiler)
+    #    
+    wget -4 -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key --keyring /etc/apt/trusted.gpg.d/llvm.gpg add -
+    echo "# Created at $(date)" > /etc/apt/sources.list.d/llvm${clangver}-org.list
+    echo "deb http://apt.llvm.org/${osname}/ llvm-toolchain-${osname} main" >> /etc/apt/sources.list.d/llvm${clangver}-org.list
+    echo "deb-src http://apt.llvm.org/${osname}/ llvm-toolchain-${osname} main" >> /etc/apt/sources.list.d/llvm${clangver}-org.list
+
+    # Update
+    apt-get update
+    # LLVM
+    apt-get install -y libllvm-${clangver}-ocaml-dev libllvm${clangver} llvm-${clangver} llvm-${clangver}-dev llvm-${clangver}-doc llvm-${clangver}-examples llvm-${clangver}-runtime
+    # Clang and co
+    apt-get install -y clang-${clangver} clang-tools-${clangver} clang-${clangver}-doc libclang-common-${clangver}-dev libclang-${clangver}-dev libclang1-${clangver} clang-format-${clangver}
+    # libfuzzer
+    apt-get install -y libfuzzer-${clangver}-dev
+    # lldb
+    apt-get install -y lldb-${clangver}
+    # lld (linker)
+    apt-get install -y lld-${clangver}
+    # libc++
+    apt-get install -y libc++-${clangver}-dev libc++abi-${clangver}-dev
+    # OpenMP
+    apt-get install -y libomp-${clangver}-dev
+
+    #
+    #   clang: Hack to fix the mess.
+    #
+    update-alternatives --install /usr/bin/clang clang /usr/bin/clang-${clangver} 1000
+    update-alternatives --install /usr/bin/llvm-symbolizer llvm-symbolizer /usr/bin/llvm-symbolizer-${clangver} 1000
+    update-alternatives --install /bin/lldb lldb /bin/lldb-${clangver} 1000
+
+    #
+    #   Voltron debug env
+    #
+    apt-get install -y python3-pip
+    pip3 install voltron
+
+    #
+    # Luajit
+    #
+    mkdir -p /tmp/luajit
+    #pushd /tmp/luajit
+    #for i in http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-2_2.0.4%2Bdfsg-1_amd64.deb \
+    # http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-common_2.0.4%2Bdfsg-1_all.deb \
+    # http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/libluajit-5.1-dev_2.0.4%2Bdfsg-1_amd64.deb \
+    # http://mirrors.edge.kernel.org/ubuntu/pool/universe/l/luajit/luajit_2.0.4%2Bdfsg-1_amd64.deb; do wget -4 $i; done
+    #dpkg -i /tmp/luajit/*.deb
+    #
+    #  Setup a src dir in /usr/local
+    #
+    mkdir -p /opt/src
+    pushd /opt/src
+
+    #
+    #  Get a modern version of cmake.  We need 3.8.2 or later to build libkqueue rpms
+    #
+    #curl -f -o cmake.sh https://cmake.org/files/v3.8/cmake-3.8.2-Linux-x86_64.sh
+    #[ "$(cat cmake.sh | openssl sha256 | sed 's/^.* //')" = "bb26b1871f9e5c2fb73476186cc94d03b674608f704b48b94d617340b87b4d73" ]
+    #sh cmake.sh --skip-license --prefix=/usr/local
+
+    #
+    #  Grab libkqueue and build
+    #
+    pushd /opt/src
+    git clone --branch master --depth=1 https://github.com/mheily/libkqueue.git
+
+    pushd libkqueue
+    cmake -G "Unix Makefiles" -DCMAKE_INSTALL_PREFIX=/usr -DCMAKE_INSTALL_LIBDIR=lib ./ && \
+        make && \
+        cpack -G DEB && \
+        dpkg -i --force-all ./libkqueue*.deb
+
+    #
+    #  Grab & Install OpenSSL 3.0x in /opt/openssl
+    #
+    ENV OPENSSL_VERSION=3.0.5
+
+    pushd /opt/src
+    wget https://www.openssl.org/source/openssl-${OPENSSL_VERSION}.tar.gz
+    tar xzf openssl-${OPENSSL_VERSION}.tar.gz
+    pushd openssl-${OPENSSL_VERSION}
+    ./Configure --prefix=/opt/openssl --openssldir=.
+    make -j `nproc` && make install
+
+    #
+    # CouchBase
+    #
+    wget -4 -O - https://packages.couchbase.com/clients/c/repos/deb/couchbase.key | apt-key --keyring /etc/apt/trusted.gpg.d/couchbase.gpg add -
+    mkdir -p /etc/apt/sources.list.d/
+    echo "deb [arch=amd64] https://packages.couchbase.com/clients/c/repos/deb/ubuntu2004 focal focal/main" > /etc/apt/sources.list.d/couchbase.list
+    apt update
+    aptitude -fy install libcouchbase3 libcouchbase3-tools libcouchbase-dev
+
+    #
+    #
+    #  Shallow clone the FreeRADIUS source
+    #
+    pushd /opt/src
+    source=https://github.com/FreeRADIUS/freeradius-server.git
+    git clone --depth 1 --no-single-branch ${source}
+
+    #
+    #   We want the 'man pages'
+    #
+    # Do not exclude man pages & other documentation
+    rm -f /etc/dpkg/dpkg.cfg.d/excludes
+    yes | unminimize
+
+    #
+    # TACACS+ PAM stuff
+    #
+    apt install -y pamtester libpam-tacplus
+
+    #
+    # TACACS+ Server
+    #
+    #apt install -y flex bison libwrap0-dev
+    #mkdir -p /etc/tacacs+
+    #git clone https://github.com/jpereira/tacacs_plus /opt/src/tacacs_plus.git
+    #pushd /opt/src/tacacs_plus.git
+    #./configure --prefix=/usr/local && make && make install
+    #
+    #COPY etc/tacacs+/tac_plus.conf /etc/tacacs+/tac_plus.conf
+    #COPY etc/pam.d/test /etc/pam.d/test
+
+    #
+    # TACACS+ Plus
+    #
+    pip3 install tacacs_plus
+
+    #
+    # Extra services
+    #
+    apt-get install -y syslog-ng
+
+    #
+    #   Update
+    #
+    apt-get update; true
+
+    #
+    #   Dist-upgrade
+    #
+    apt-get -y dist-upgrade
+
+    #
+    #   Jorge's dotfiles
+    #
+    # Persist envs
+    pushd /root
+    git clone https://github.com/jpereira/dotfiles/ dotfiles.git
+    pushd dotfiles.git
+    ./install.sh run
+
+  SHELL
+
+  # Copy the files.
+  config.vm.provision "file", source: "mount-devel.sh", destination: "$HOME/mount-devel.sh"
+end
